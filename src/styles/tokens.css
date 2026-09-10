@@ -1,0 +1,61 @@
+:root {
+  --color-page-background: #fafaf8;
+  --color-text-primary: #20201e;
+  --color-text-secondary: #686862;
+  --color-border: #deded8;
+  --color-visual-stone: #e5e5df;
+  --color-visual-silver: #dcdedc;
+  --color-visual-sand: #e8e4de;
+  --color-action-hover: #000000;
+
+  --font-sans: 'Manrope', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --text-small: 0.875rem;
+  --text-body: 1rem;
+  --text-section: 1.25rem;
+  --text-project: 1.75rem;
+  --text-name: 3.5rem;
+
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  --radius-0: 0;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  --layout-max-width: 79rem;
+  --layout-profile-width: 17.5rem;
+  --layout-column-gap: 6rem;
+  --motion-duration: 180ms;
+  --motion-duration-surface: 260ms;
+  --motion-duration-entrance: 300ms;
+  --motion-ease: cubic-bezier(0.2, 0.65, 0.3, 1);
+}
+
+/* Desktop composition; the existing small-screen scale stays independent. */
+@media (min-width: 901px) {
+  :root {
+    --layout-max-width: 88rem;
+    --layout-profile-width: clamp(16.5rem, 19vw, 18rem);
+    --layout-column-gap: clamp(3rem, 5vw, 5rem);
+    --text-name: clamp(4.75rem, 5.8vw, 5.5rem);
+    --text-project-lead: clamp(2.25rem, 3vw, 3rem);
+    --text-project: clamp(1.75rem, 2.3vw, 2.25rem);
+    --text-section: 1rem;
+    --space-project-gap: clamp(4rem, 6vw, 6rem);
+    --project-inset: 16%;
+    --desktop-page-inset: 3rem;
+    --desktop-page-top: 2.5rem;
+    --desktop-heading-height: 2.75rem;
+    --desktop-profile-top: calc(var(--desktop-page-top) + var(--desktop-heading-height));
+  }
+}
