@@ -3,8 +3,8 @@ import { projects } from '../data/portfolio'
 export function Work() {
   return (
     <section id="work" className="project-list" aria-label="Избранные проекты">
-      {projects.map((project) => (
-        <ProjectCard key={project.id} project={project} />
+      {projects.map((project, index) => (
+        <ProjectCard key={project.id} project={project} index={index} />
       ))}
     </section>
   )

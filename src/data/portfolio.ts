@@ -1,188 +1,245 @@
-// Prototype content and contact destinations. Replace with verified details before publishing.
+import caseDocuments from './caseDocuments.json'
+import { caseCoverDimensions, caseImages } from './caseImages'
+import { publicAsset } from '../lib/publicAsset'
+
 export const profile = {
   name: 'Софья Стрельченко',
   role: 'UX/UI & Product Designer',
   location: 'Москва • GMT+3',
-  email: 'mailto:sophia@example.com',
+  email: 'mailto:sofia.ux.ui@icloud.com',
   telegram: 'https://example.com/telegram',
-  cv: '/resume.html',
-  linkedin: 'https://example.com/linkedin',
+  cv: publicAsset('resume.html'),
+  linkedin: 'https://www.linkedin.com/in/sophie-dsgn',
   about:
-    'Собираю прототипы за часы, автоматизирую рутину в Figma и AI-инструментах, выстраиваю дизайн-системы, которые масштабируются без потери качества. В «Небо» проектировала интерфейсы для пилотов: мониторинг полётов и инструкции для критических ситуаций, где важна читаемость данных под стрессом. В студии MAX вела мобильные продукты — от аренды кладовок до кабинета селлера маркетплейса. На фрилансе беру самые разные задачи, от завода до магазина косметики, и быстро вникаю в специфику.',
+    'Разбираюсь в сложных требованиях, нахожу слабые места в пользовательских сценариях и довожу решения до разработки. Для меня качество дизайна — это и сильный визуал, и результат: сможет ли человек разобраться в продукте, завершить задачу и захотеть вернуться',
 }
 
 export type Experience = {
   company: string
   role: string
   period: string
+  summary?: string
+  certificateUrl?: string
   logo?: string
+  projects?: ExperienceProject[]
+}
+
+export type ExperienceProject = {
+  title: string
+  results: string[]
+  problem: string
+  solution: string
 }
 
 export const experience: Experience[] = [
   {
-    company: '«Небо»',
-    role: 'Продуктовый дизайнер',
-    period: 'Апрель 2026 — Июль 2026',
+    company: 'Юкки',
+    role: 'UX/UI-дизайнер',
+    period: '02.2025 — 10.2025',
+    logo: '/icons/job/Юкки.webp',
+    summary: 'Редизайн лендинга и калькулятора займа, личный кабинет заёмщика',
+    projects: [
+      { title: 'Редизайн лендинга и интерактивного калькулятора займа', results: ['Рост CR из визита в отправку анкеты на займ на +14%', 'Снижение показателей отказов (Bounce Rate) на первом экране на −20%', 'Сокращение времени взаимодействия с калькулятором на −25%'], problem: 'Пользователи не до конца понимали итоговую стоимость займа и переплату на первом экране, из-за чего бросали сценарий расчета на этапе ввода базовых параметров', solution: 'Пересобрала пользовательский путь от первого экрана до целевого действия, упростила логику взаимодействия с калькулятором займа, усилила визуальную иерархию и прозрачность условий' },
+      { title: 'Разработка личного кабинета заемщика', results: ['Рост доли повторных погашений и продлений Retention на +9%', 'Сокращение обращений в службу поддержки по вопросам статуса займа на −25%'], problem: 'Действующим клиентам было трудно находить информацию о текущем займе, датах платежей и доступных лимитах, из-за чего они совершали просрочки или обращались в саппорт', solution: 'Спроектировала дашборд личного кабинета с акцентом на ключевой статус займа и срочностью погашения, выстроила прозрачную систему нотификаций и сократила путь до совершения платежа или продления до 2 кликов' },
+    ],
   },
   {
-    company: 'Студия MAX',
-    role: 'UX/UI дизайнер',
-    period: 'Сентябрь 2025 — Март 2026',
+    company: 'Make Difference',
+    role: 'UX/UI-дизайнер',
+    period: '10.2025 — 07.2026',
+    logo: '/icons/job/Make_Difference.jpg',
+    summary: 'Экосистема женского здоровья, Atlyx и Астория: архитектура и ключевые сценарии',
+    projects: [
+      { title: '01. Экосистема женского здоровья', results: ['Рост активации новых пользователей (Activation Rate) на +12%', 'Рост CR в запись на консультацию на +10%', 'Рост D30 Retention на +8%', 'Сокращение времени до первого целевого действия на −15%'], problem: 'Идея большой платформы вокруг личного бренда врача (обучение, контент, консультации, магазин, личный кабинет, трекинг здоровья) на старте не имела фокуса — нужно было превратить широкую идею в понятный MVP и не распыляться на функции следующих этапов', solution: 'Структурировала продуктовую концепцию и определила MVP-функциональность, разработала архитектуру экосистемы из связанных модулей, определила ключевые сценарии обучения, консультаций, покупок и работы с персональными данными' },
+      { title: '2. Atlyx — мобильное приложение для путешествий', results: ['Рост D30 Retention на +7%', 'Рост конверсии в создание первой поездки на +12%', 'Рост использования сохраненных мест и маршрутов на +10%'], problem: 'Приложению требовалось связать хранение поездок, перелетов, мест на карте и статистики в единый привычный сценарий, иначе пользователь открывал бы его пару раз перед поездкой и не возвращался', solution: 'Сформировала структуру приложения вокруг ключевых задач путешественника, спроектировала сценарии планирования поездок, добавления мест и просмотра статистики, разработала концепцию личного кабинета и достижений, заложила игровые механики для повышения вовлеченности' },
+      { title: '3. Астория — онлайн-агрегатор туров', results: ['Рост CR из поиска тура в отправку заявки на +10%', 'Рост CTR карточек туров на +13%', 'Сокращение времени поиска подходящего тура на −16%', 'Снижение отказов на этапе выбора тура на −5%'], problem: 'Клиент хотел уйти от внешних виджетов Турвизора к собственному сервису поиска и бронирования: виджеты не давали управлять опытом пользователя (выдачей, фильтрами, страницами направлений), что мешало бизнесу масштабировать продукт', solution: 'Спроектировала UX-архитектуру агрегатора туров, разработала сценарии поиска, фильтрации, выбора и оформления тура, создала структуру карточки тура и страниц направлений, продумала административную часть для управления контентом и промо-блоками, подготовила адаптивные макеты, UI-компоненты и спецификации' },
+    ],
   },
   {
-    company: 'Агентство ММР',
-    role: 'Веб-дизайнер',
-    period: 'Июнь 2025 — Сентябрь 2025',
+    company: 'SkyCapital Group',
+    role: 'Product / UX/UI-дизайнер',
+    period: '08.2026 — н.в.',
+    logo: '/icons/job/SkyCapital_Group.svg',
+    summary: 'White Label, Partner Portal и SkyWallet: финансовые сценарии и дизайн-системы',
+    projects: [
+      { title: '1. Разработка crypto-сайтов «под ключ» по ТЗ (White Label)', results: ['Рост CR в целевую заявку на ~12%', 'Снижение показателей отказов (Bounce Rate) на ~22%', 'Сокращение TTM запуска новых продуктов на ~20%'], problem: 'Заказчикам White Label продуктов требовалось оперативно запускать конверсионные лендинги под индивидуальные криптопродукты без потери в качестве пользовательского опыта и брендинга', solution: 'Спроектировала гибкую модульную сетку и адаптивную архитектуру посадочных страниц, усилила визуальную иерархию и CTA-структуру, заложила масштабируемый UI-kit для быстрой кастомизации под требования партнёров и передала разработчикам чистые спецификации' },
+      { title: '2. Редизайн внешнего и внутреннего контуров SkyCapital (web + mobile)', results: ['Сокращение времени прохождения ключевых сценариев в личном кабинете на ~30%', 'Снижение процента валидационных ошибок при заполнении форм на ~35%', 'Снижение объема обращений в поддержку по интерфейсным багам в ~1.8 раза'], problem: 'Пользователи и партнеры теряли контекст при работе со сложными финансовыми данными и транзакциями, из-за чего зависели от ручной коммуникации с менеджерами', solution: 'Пересобрала информационную архитектуру и навигацию внутреннего контура, выстроила прозрачную систему статусов и уведомлений, снизила когнитивную нагрузку в интерфейсах личного кабинета и оптимизировала адаптивные сценарии под мобильные устройства' },
+      { title: '3. Дизайн приложения SkyWallet', results: ['Рост завершенности транзакционных сценариев (CR в успешный перевод) на ~16%', 'Рост показателей удержания пользователей (Retention D7–D30) на ~10%'], problem: 'Пользователям было сложно ориентироваться в базовых операциях с цифровыми активами, что приводило к брошенным сценариям на этапе авторизации и перевода средств', solution: 'Упростила сценарий ключевых транзакций до минимального количества шагов, переработала UX-логику онбординга и обеспечила высокую консистентность интерфейсных элементов на базе единой дизайн-системы' },
+    ],
   },
-  {
-    company: 'Фриланс',
-    role: 'Веб-дизайнер',
-    period: 'Январь 2025 — по настоящее время',
-  },
-]
+].map((item) => ({ ...item, logo: item.logo ? publicAsset(item.logo) : undefined }))
 
-// Temporary education content; replace with verified credentials.
 export const education: Experience[] = [
-  { company: 'НИУ ВШЭ', role: 'Дизайн', period: '2021–2025 • Бакалавриат' },
-  { company: 'Яндекс Практикум', role: 'UX/UI-дизайн', period: '2025 • Курс' },
+  { company: 'FormFactor', role: 'Продуктовый дизайн', period: '2026', logo: '/icons/job/Изображение ChatGPT 1 окт. 2026 г., 01_11_09.png' },
   {
-    company: 'Британка',
-    role: 'Продуктовый дизайн',
-    period: '2026 • Интенсив',
+    company: 'Contented',
+    role: 'UX/UI-дизайнер с нуля до PRO',
+    period: '2024 — 2025',
+    logo: '/icons/job/Contented.png',
+    certificateUrl: 'https://cloud.mail.ru/public/8w32/g9yfb6Yg2',
   },
-  {
-    company: 'Нетология',
-    role: 'Исследования и аналитика',
-    period: '2026 • Курс',
-  },
-]
+].map((item) => ({ ...item, logo: item.logo ? publicAsset(item.logo) : undefined }))
 
-// Original prepared assets, including their double extensions.
+// Keep the editorial order: design, research, collaboration, then AI.
 export const toolLogos = [
-  { id: 'figma', label: 'Figma' },
-  { id: 'miro', label: 'Miro' },
-  { id: 'yandex-metrica', label: 'Яндекс Метрика' },
-  { id: 'google-analytics', label: 'Google Analytics' },
-  { id: 'atlassian', label: 'Atlassian' },
-  { id: 'notion', label: 'Notion' },
-  { id: 'chatgpt', label: 'ChatGPT' },
-  { id: 'claude', label: 'Claude' },
-  { id: 'protopie', label: 'ProtoPie' },
-  { id: 'principle', label: 'Principle' },
-  { id: 'cursor', label: 'Cursor' },
-]
+  { id: 'figma', label: 'Figma', src: '/icons/tools/figma.svg.svg' },
+  { id: 'protopie', label: 'ProtoPie', src: '/icons/tools/protopie.svg.svg' },
+  { id: 'principle', label: 'Principle', src: '/icons/tools/principle-app-2.svg' },
+  { id: 'miro', label: 'Miro', src: '/icons/tools/miro.svg.svg' },
+  { id: 'yandex-metrica', label: 'Яндекс Метрика', src: '/icons/tools/yandex-metrica.svg.svg' },
+  { id: 'google-analytics', label: 'Google Analytics', src: '/icons/tools/google-analytics.svg.svg' },
+  { id: 'notion', label: 'Notion', src: '/icons/tools/notion.svg.svg' },
+  { id: 'jira', label: 'Jira', src: '/icons/tools/jira-3.svg' },
+  { id: 'confluence', label: 'Confluence', src: '/icons/tools/Confluence.svg' },
+  { id: 'chatgpt', label: 'ChatGPT', src: '/icons/tools/chatgpt.svg.svg' },
+  { id: 'claude', label: 'Claude', src: '/icons/tools/claude.svg.svg' },
+  { id: 'cursor', label: 'Cursor', src: '/icons/tools/cursor.svg.svg' },
+].map((tool) => ({ ...tool, src: publicAsset(tool.src) }))
+
+export type CaseBlock = {
+  kind: string
+  bullet: boolean
+  text: string
+}
+
+export type CaseImage = {
+  src: string
+  alt: string
+  caption: string
+  width: number
+  height: number
+}
+
+export type CaseVideo = {
+  id: string
+  title: string
+  shortTitle: string
+  src: string
+  poster: string
+  width: number
+  height: number
+}
 
 export type Project = {
-  id: 'storage-app' | 'b2b-saas' | 'fintech'
+  id: string
   title: string
   description: string
   tags: string[]
-  year: string
-  figmaUrl: string
-  context: string
-  task: string
-  limitations: string[]
-  process: string
-  concept: string
-  system: string
-  steps: string[]
+  discipline: string
+  platform: string
+  niche?: string
+  document: CaseBlock[]
+  figmaUrl?: string
+  cover?: string
+  coverDimensions?: { width: number; height: number }
+  images?: Partial<Record<'context' | 'structure' | 'concept' | 'system' | 'final', CaseImage[]>>
+  videos?: CaseVideo[]
 }
 
 export const projects: Project[] = [
   {
-    id: 'storage-app',
-    title:
-      'Мобильное приложение для аренды кладовок и хранения вещей на складе',
-    description:
-      'Работала над сдачей вещей на склад, флоу проверки документов и личным кабинетом владельца склада',
-    tags: ['B2B', 'B2C'],
-    year: '2026',
-    figmaUrl: 'https://www.figma.com/',
-    context:
-      'IT-платформа для управления автоматизированными кладовками у многоквартирных домов для хранения вещей жителей крупных жилых массивов. Помещения могут быть собственными или партнёрскими.',
-    task: 'Масштаб бизнеса упирается в партнёров — владельцев складов: скупить достаточно собственных помещений нереально. Финмодель простая: компания собирает подписку с клиентов и ежемесячно переводит деньги партнёрам, удерживая комиссию за управление и эквайринг.\nОтсюда цель продукта: обслужить эту комиссионную модель и дать партнёрской сети масштабироваться — приложение должно одинаково хорошо работать и для жильца с кладовкой, и для предпринимателя с десятком складов.',
-    limitations: [
-      'СКУД с открытым API для интеграции;',
-      'Входная дверь и замки ячеек открываются по BLE (Bluetooth), критично — без интернета;',
-      'Единый сценарий для собственных и партнёрских складов.',
-    ],
-    process:
-      'Начала с карты пользовательских сценариев: от выбора объёма до возврата вещей. Вместе с командой разобрали работу муверов, проверку документов и ситуации, когда что-то идёт не по плану. На прототипах проверили, понятно ли человеку, где сейчас его вещи и что нужно сделать дальше.',
-    concept:
-      'Спокойный интерфейс для сложного сервиса. Фиолетовый выделяет главное действие и текущий статус, светлые поверхности разделяют этапы. На одном экране — одна понятная задача. Детали доступны рядом, но не отвлекают от основного сценария.',
-    system:
-      'Собрала библиотеку компонентов для двух ролей: клиента и партнёра. Общие токены, карточки, статусы и поля помогают команде развивать продукт последовательно. Для каждого компонента описала состояния загрузки, ошибки и пустого экрана.',
-    steps: [
-      'Выбрать объём',
-      'Оформить аренду',
-      'Передать вещи',
-      'Следить за заказом',
+    id: 'concepts',
+    title: 'Концепты',
+    description: 'В свободное время исследую визуальные подходы и анимацию интерфейсов в собственных концептах',
+    tags: ['UI', 'Motion'],
+    discipline: 'UX/UI-дизайнер',
+    platform: 'Web · Mobile',
+    document: [],
+    cover: '/cases/concept/Обложка.png?v=20261001-1154',
+    coverDimensions: { width: 4584, height: 3438 },
+    videos: [
+      { id: 'messenger', title: 'Концепт мобильного мессенджера', shortTitle: 'Мессенджер', src: '/cases/concept/1.mp4', poster: '/cases/concept/poster-1.webp', width: 2800, height: 2100 },
+      { id: 'weather', title: 'Концепт приложения с прогнозом погоды', shortTitle: 'Погода', src: '/cases/concept/2.mp4', poster: '/cases/concept/poster-2.webp', width: 2800, height: 2100 },
+      { id: 'crypto-wallet', title: 'Концепт мобильного криптокошелька', shortTitle: 'Криптокошелёк', src: '/cases/concept/3.mp4', poster: '/cases/concept/poster-3.webp', width: 2800, height: 2100 },
+      { id: 'sales-analytics', title: 'Концепт панели аналитики продаж', shortTitle: 'Аналитика', src: '/cases/concept/4.mp4', poster: '/cases/concept/poster-4.webp', width: 2800, height: 2100 },
+      { id: 'energy', title: 'Концепт приложения для отслеживания расхода энергии', shortTitle: 'Энергия', src: '/cases/concept/5.mp4', poster: '/cases/concept/poster-5.webp', width: 2800, height: 2100 },
+      { id: 'jobs', title: 'Концепт мобильного сервиса поиска работы', shortTitle: 'Поиск работы', src: '/cases/concept/6.mp4', poster: '/cases/concept/poster-6.webp', width: 2800, height: 2100 },
     ],
   },
   {
-    id: 'b2b-saas',
-    title: 'Личный кабинет для продавцов и управления заказами',
+    id: 'partner-portal',
+    title: 'Partner Portal — проверка ордеров на 25% быстрее',
     description:
-      'Объединила заказы, каталог и работу команды в одном понятном инструменте для селлеров',
-    tags: ['B2B', 'SaaS'],
-    year: '2025',
-    figmaUrl: 'https://www.figma.com/',
-    context:
-      'Сервис для небольших брендов, которые продают на нескольких площадках. Менеджеры ежедневно переключаются между заказами, таблицами остатков и перепиской с командой.',
-    task: 'Спроектировать единое рабочее пространство, в котором продавец видит состояние заказа, находит нужные товары и передаёт задачи коллегам. Сохранить привычную логику работы, убрав повторный ввод данных и лишние переходы.',
-    limitations: [
-      'Данные поступают из нескольких внешних API;',
-      'У участников команды разные права доступа;',
-      'Интерфейс должен оставаться понятным при большом каталоге.',
-    ],
-    process:
-      'Разобрала рабочий день менеджера и собрала карту переходов между инструментами. Выделила три основных сценария: обработка заказа, обновление товара и передача задачи. Проверила структуру на интерактивном прототипе.',
-    concept:
-      'Рабочий инструмент с редакционной ясностью: аккуратная типографика, предсказуемая навигация и контекстные действия. Цвет используется только там, где помогает отличить статусы и заметить задачу, требующую внимания.',
-    system:
-      'Основа системы — таблицы, фильтры, карточки заказа и боковые панели. Компоненты поддерживают разные права доступа, пустые состояния и частичную загрузку данных.',
-    steps: [
-      'Найти заказ',
-      'Проверить состав',
-      'Подготовить отправку',
-      'Передать в доставку',
-    ],
+      'Собрала в кабинете показатели бизнеса, проверку ордеров и диагностику интеграции',
+    tags: ['B2B', 'FinTech / Crypto'],
+    discipline: 'Product дизайнер',
+    platform: 'Web · Mobile',
+    niche: 'FinTech / Crypto',
+    document: caseDocuments['partner-portal'],
+    cover: '/cases/partner-portal/Обложка.png',
+    coverDimensions: caseCoverDimensions('partner-portal'),
+    images: caseImages['partner-portal'],
   },
   {
-    id: 'fintech',
-    title: 'Мобильный банк, в котором повседневные финансы под контролем',
+    id: 'skywallet',
+    title: 'SkyWallet — ошибки переводов −30%',
     description:
-      'Спроектировала переводы, историю операций и управление счетами без лишних шагов',
-    tags: ['B2C', 'Fintech'],
-    year: '2025',
-    figmaUrl: 'https://www.figma.com/',
-    context:
-      'Мобильное приложение для ежедневных финансовых задач. Пользователям важно быстро проверить счёт, перевести деньги близким и разобраться в истории операций.',
-    task: 'Сделать ежедневные платежи понятными и предсказуемыми. Показывать сумму, получателя и комиссию до подтверждения, а после операции — однозначный результат и доступ к чеку.',
-    limitations: [
-      'Подтверждение чувствительных действий по требованиям безопасности;',
-      'Обработка задержек и недоступности платёжных сервисов;',
-      'Доступность для пользователей с разным цифровым опытом.',
-    ],
-    process:
-      'Изучила сценарии переводов и причины ошибок. Перестроила последовательность ввода данных, затем проверила на прототипе поиск получателя, подтверждение и повторный перевод.',
-    concept:
-      'Сдержанная палитра и крупные суммы создают ясную иерархию. Основные действия всегда на привычном месте, а детали операции раскрываются последовательно.',
-    system:
-      'Общие компоненты счетов, получателей и операций работают во всех сценариях. Отдельно описаны состояния обработки, отмены и повторной отправки, чтобы интерфейс не оставлял пользователя в неопределённости.',
-    steps: [
-      'Выбрать получателя',
-      'Указать сумму',
-      'Проверить данные',
-      'Подтвердить перевод',
-    ],
+      'Спроектировала безопасные сценарии хранения и перевода активов с понятным разделением личного кошелька и биржевого счёта.',
+    tags: ['B2C', 'FinTech / Crypto'],
+    discipline: 'Product дизайнер',
+    platform: 'Mobile app',
+    niche: 'Fintech / Crypto',
+    document: caseDocuments.skywallet,
+    cover: '/cases/skywallet/Обложка.png',
+    coverDimensions: caseCoverDimensions('skywallet'),
+    images: caseImages.skywallet,
   },
-]
+  {
+    id: 'astoria',
+    title: 'Астория — +12% к заявкам',
+    description:
+      'Спроектировала адаптивный сервис для поиска, сравнения и оформления туров. Собственный интерфейс на базе API Турвизора позволил выйти за рамки готовых виджетов и заложить основу онлайн-турагентства',
+    tags: ['B2C', 'TravelTech'],
+    discipline: 'UX/UI-дизайнер',
+    platform: 'Web · Mobile',
+    niche: 'TravelTech',
+    document: caseDocuments.astoria,
+    cover: '/cases/astoria/Обложка.png',
+    coverDimensions: caseCoverDimensions('astoria'),
+    images: caseImages.astoria,
+  },
+  {
+    id: 'womens-health',
+    title: 'HealthTech: +25% Activation Rate',
+    description:
+      'Определила архитектуру и границы MVP для платформы с обучением, консультациями и личным кабинетом.',
+    tags: ['B2C', 'FemTech / HealthTech'],
+    discipline: 'UX/UI-дизайнер',
+    platform: 'mobile app · landing',
+    niche: 'FemTech / HealthTech',
+    document: caseDocuments['womens-health'],
+    cover: '/cases/womens-health/Обложка.png',
+    coverDimensions: caseCoverDimensions('womens-health'),
+    images: caseImages['womens-health'],
+  },
+  {
+    id: 'atlyx',
+    title: 'Atlyx — travel superapp с retention +10%',
+    description:
+      'Связала планирование поездок, перелёты, сохранённые места и личную статистику в мобильном приложении',
+    tags: ['B2C', 'TravelTech'],
+    discipline: 'UX/UI-дизайнер',
+    platform: 'Mobile app',
+    niche: 'TravelTech',
+    document: caseDocuments.atlyx,
+    cover: '/cases/atlyx/Обложка.png',
+    coverDimensions: caseCoverDimensions('atlyx'),
+    images: caseImages.atlyx,
+  },
+].map((project) => ({
+  ...project,
+  cover: project.cover ? publicAsset(project.cover) : undefined,
+  videos: project.videos?.map((video) => ({
+    ...video,
+    src: publicAsset(video.src),
+    poster: publicAsset(video.poster),
+  })),
+}))
 
 export const caseSections = [
   { id: 'context', label: 'Контекст' },
-  { id: 'structure', label: 'Процесс' },
-  { id: 'concept', label: 'Концепция' },
+  { id: 'structure', label: 'Стратегия' },
+  { id: 'concept', label: 'Решение' },
   { id: 'system', label: 'Система' },
-  { id: 'final', label: 'Финализация' },
+  { id: 'final', label: 'Результат' },
 ]

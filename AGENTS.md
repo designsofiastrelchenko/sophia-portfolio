@@ -43,6 +43,19 @@ Before major visual changes:
 
 Never redesign unrelated sections.
 
+## Figma workflow
+
+Figma is the source of truth for visual implementation.
+
+When a Figma frame URL is provided:
+- inspect the frame through the Figma MCP server before coding
+- use Figma layout, spacing, hierarchy, components, variables and visual proportions as the primary reference
+- preserve the existing React architecture and site-wide design system
+- do not reinterpret the design unless explicitly asked
+- do not replace Figma-defined spacing, radii or proportions with generic defaults
+- reuse existing project components where visually equivalent
+- if the Figma design conflicts with an existing implementation, prefer the Figma design for that specific screen unless instructed otherwise
+
 # Quality
 
 The website must:

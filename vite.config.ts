@@ -1,7 +1,17 @@
 import react from '@vitejs/plugin-react'
+import { copyFileSync, writeFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-})
+export default defineConfig(({ command, isPreview }) => ({
+  base: command === 'build' || isPreview ? '/sophia-portfolio/' : '/',
+  plugins: [
+    react(),
+    ...(command === 'build' ? [{
+      name: 'github-pages-spa-fallback',
+      closeBundle() {
+        copyFileSync('dist/index.html', 'dist/404.html')
+        writeFileSync('dist/.nojekyll', '')
+      },
+    }] : []),
+  ],
+}))

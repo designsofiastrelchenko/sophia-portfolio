@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import {
   BrowserRouter,
   Link,
@@ -12,16 +12,34 @@ import { ProjectPage } from './pages/ProjectPage'
 import { Footer } from './components/Footer'
 import { profile } from './data/portfolio'
 import { ScrollReveals } from './components/ScrollReveals'
+import { MobileHeader } from './components/MobileHeader'
+import { CopyrightPage } from './pages/CopyrightPage'
+import { useCaseScrollTracking, usePageTracking } from './hooks/useAnalyticsTracking'
+
+function AnalyticsTracking() {
+  usePageTracking()
+  useCaseScrollTracking()
+  return null
+}
 
 function ScrollToPage() {
   const { pathname, hash } = useLocation()
   const previousPath = useRef<string | null>(null)
-  useEffect(() => {
-    if (hash)
-      document
-        .getElementById(hash.slice(1))
-        ?.scrollIntoView({ behavior: 'instant' })
-    else if (previousPath.current !== pathname)
+  useLayoutEffect(() => {
+    if (hash) {
+      const target = document.getElementById(hash.slice(1))
+      const caseNavigation = target?.closest('.case-shell')?.querySelector('.case-navigation')
+      if (target && caseNavigation) {
+        const mobile = window.matchMedia('(max-width: 760px)').matches
+        const headerHeight = mobile
+          ? document.querySelector('.mobile-header')?.getBoundingClientRect().height ?? 0
+          : 0
+        const navigationTop = mobile ? headerHeight + 8 : 12
+        const top = window.scrollY + target.getBoundingClientRect().top -
+          navigationTop - caseNavigation.getBoundingClientRect().height - 16
+        window.scrollTo({ top, behavior: 'instant' })
+      } else target?.scrollIntoView({ behavior: 'instant' })
+    } else if (previousPath.current !== pathname)
       window.scrollTo({ top: 0, behavior: 'instant' })
     if (pathname === '/') document.title = `${profile.name} — ${profile.role}`
     if (previousPath.current !== null && previousPath.current !== pathname) {
@@ -44,15 +62,18 @@ function HomePage() {
 }
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <a className="skip-link" href="#main-content">
         Перейти к содержимому
       </a>
       <ScrollToPage />
+      <AnalyticsTracking />
       <ScrollReveals />
+      <MobileHeader />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/projects/:slug" element={<ProjectPage />} />
+        <Route path="/copyright" element={<CopyrightPage />} />
         <Route
           path="*"
           element={
