@@ -3,7 +3,7 @@ import { copyFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 
 export default defineConfig(({ command, isPreview }) => ({
-  base: command === 'build' || isPreview ? '/sophia-portfolio/' : '/',
+  base: command === 'build' || isPreview ? '/portfolio/' : '/',
   plugins: [
     react(),
     ...(command === 'build' ? [{
