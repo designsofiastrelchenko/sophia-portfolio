@@ -1,18 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Footer } from '../components/Footer'
+import { motion } from 'framer-motion'
+import { useMotionSystem } from '../lib/motion'
+import { useEffect, useRef, useState } from 'react'
+import { useReducedMotion } from 'framer-motion'
 import { Icon } from '../components/Icon'
-import { CaseNavigation } from '../components/CaseNavigation'
 import type { CaseVideo, Project } from '../data/portfolio'
 import { withoutFinalPeriod } from '../data/caseContent'
 import { VisualCaption } from '../components/VisualCaption'
+import { CaseMediaStage } from '../components/CaseMediaStage'
+import { Typography } from '../components/Typography'
 
-type Props = { project: Project; nextProject: Project }
+type Props = { project: Project }
 const emptyVideos: CaseVideo[] = []
 
-export function ConceptCasePage({ project, nextProject }: Props) {
+export function ConceptCasePage({ project }: Props) {
+  const { hoverLift } = useMotionSystem()
+  const reducedMotion = useReducedMotion()
   const videos = project.videos ?? emptyVideos
-  const sections = useMemo(() => videos.map(({ id, shortTitle }) => ({ id, label: shortTitle })), [videos])
   const elements = useRef<(HTMLVideoElement | null)[]>([])
   const control = useRef<(index: number) => void>(() => {})
   const [playing, setPlaying] = useState<number | null>(null)
@@ -92,7 +95,7 @@ export function ConceptCasePage({ project, nextProject }: Props) {
       const best = eligible.sort((a, b) =>
         visible[b]!.ratio - visible[a]!.ratio || visible[a]!.distance - visible[b]!.distance,
       )[0]
-      const target = manual ?? best
+      const target = manual ?? (reducedMotion ? undefined : best)
       if (target === undefined) pauseActive()
       else start(target)
     }
@@ -137,7 +140,11 @@ export function ConceptCasePage({ project, nextProject }: Props) {
         pauseActive()
         return
       }
-      if (finished.has(index)) video.currentTime = 0
+      if (finished.has(index)) {
+        video.currentTime = 0
+        finished.delete(index)
+        setCompleted([...finished])
+      }
       manuallyPaused.delete(index)
       blocked.delete(index)
       const visible = visibility(video)
@@ -164,15 +171,14 @@ export function ConceptCasePage({ project, nextProject }: Props) {
       })
       control.current = () => {}
     }
-  }, [videos])
+  }, [videos, reducedMotion])
 
   return (
-    <div className="case-shell concept-case">
+    <Typography><div className="case-shell concept-case">
       <main className="case-main" id="main-content" tabIndex={-1}>
-        <CaseNavigation isShort={false} projectId={project.id} sections={sections} />
-        <header className="case-header">
+        <header className="case-header" id="overview">
           <h1 data-reveal="case-intro" data-reveal-order="0">{project.title}</h1>
-          <p className="case-discipline" data-reveal="case-intro" data-reveal-order="1">{withoutFinalPeriod(project.description)}</p>
+          <p className="case-deck" data-reveal="case-intro" data-reveal-order="1">{withoutFinalPeriod(project.description)}</p>
         </header>
         <div className="concept-gallery" aria-label="Видео концептов">
           {videos.map((item, index) => {
@@ -181,7 +187,7 @@ export function ConceptCasePage({ project, nextProject }: Props) {
             const label = hasEnded && !isPlaying ? 'Повторить' : isPlaying ? 'Пауза' : 'Воспроизвести'
             return (
               <figure className="concept-video-item" id={item.id} key={item.id} data-reveal="image">
-                <div className="concept-video-media"><video
+                <CaseMediaStage fill><video
                   ref={(node) => { elements.current[index] = node }}
                   src={item.src}
                   poster={item.poster}
@@ -191,22 +197,17 @@ export function ConceptCasePage({ project, nextProject }: Props) {
                   playsInline
                   preload="none"
                   aria-label={item.title}
-                /></div>
-                <VisualCaption action={<button type="button" className="concept-video-action" onClick={() => control.current(index)} aria-label={`${label}: ${item.title}`} title={`${label}: ${item.title}`}>
+                /></CaseMediaStage>
+                <VisualCaption action={<motion.button {...hoverLift} type="button" className="concept-video-action" onClick={() => control.current(index)} aria-label={`${label}: ${item.title}`} title={`${label}: ${item.title}`}>
                     <span className="concept-video-action-visual"><Icon name={hasEnded && !isPlaying ? 'replay' : isPlaying ? 'pause' : 'play'} /></span>
-                  </button>}>
-                  {item.title}
+                  </motion.button>}>
+                  {withoutFinalPeriod(item.title)}
                 </VisualCaption>
               </figure>
             )
           })}
         </div>
-        <Link className="next-project" to={`/projects/${nextProject.id}`}>
-          <span>Следующий проект<strong>{nextProject.title}</strong></span>
-          <span className="icon-action project-open"><span className="icon-motion" aria-hidden="true"><Icon name="external" /></span></span>
-        </Link>
-        <Footer />
       </main>
-    </div>
+    </div></Typography>
   )
 }

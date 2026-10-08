@@ -8,10 +8,23 @@ export const profile = {
   location: 'Москва • GMT+3',
   email: 'mailto:sofia.ux.ui@icloud.com',
   telegram: 'https://example.com/telegram',
-  cv: publicAsset('resume.html'),
+  cv: 'https://example.com/resume',
+  hh: 'https://example.com/hh',
   linkedin: 'https://www.linkedin.com/in/sophie-dsgn',
   about:
     'Разбираюсь в сложных требованиях, нахожу слабые места в пользовательских сценариях и довожу решения до разработки. Для меня качество дизайна — это и сильный визуал, и результат: сможет ли человек разобраться в продукте, завершить задачу и захотеть вернуться',
+}
+
+export const aboutPresentation = {
+  background: 'В опыте — Юкки, Make Difference и SkyCapital Group: финтех, цифровые продукты, личные кабинеты и мобильные сценарии. Училась продуктовому и UX/UI-дизайну в FormFactor и Contented',
+  statement: 'От сложных требований — к понятным продуктовым решениям.',
+  emphasis: 'Разбираюсь в сценариях, нахожу слабые места и соединяю сильный визуал с логикой продукта и бизнес-результатом',
+  principles: [
+    { title: 'UI и UX', description: 'Соединяю сильный визуал с понятными пользовательскими сценариями' },
+    { title: 'Фокус на результате', description: 'Важно, чтобы человек разобрался в продукте, завершил задачу и захотел вернуться' },
+    { title: 'От требований к разработке', description: 'Разбираюсь в сложных требованиях и довожу решения до разработки' },
+    { title: 'Эмпатия', description: 'Нахожу слабые места в сценариях, которые мешают человеку пользоваться продуктом' },
+  ],
 }
 
 export type Experience = {
@@ -82,19 +95,23 @@ export const education: Experience[] = [
 
 // Keep the editorial order: design, research, collaboration, then AI.
 export const toolLogos = [
-  { id: 'figma', label: 'Figma', src: '/icons/tools/figma.svg.svg' },
-  { id: 'protopie', label: 'ProtoPie', src: '/icons/tools/protopie.svg.svg' },
+  { id: 'figma', label: 'Figma', src: '/icons/tools/figma.svg' },
+  { id: 'protopie', label: 'ProtoPie', src: '/icons/tools/protopie.svg' },
   { id: 'principle', label: 'Principle', src: '/icons/tools/principle-app-2.svg' },
-  { id: 'miro', label: 'Miro', src: '/icons/tools/miro.svg.svg' },
-  { id: 'yandex-metrica', label: 'Яндекс Метрика', src: '/icons/tools/yandex-metrica.svg.svg' },
-  { id: 'google-analytics', label: 'Google Analytics', src: '/icons/tools/google-analytics.svg.svg' },
-  { id: 'notion', label: 'Notion', src: '/icons/tools/notion.svg.svg' },
+  { id: 'miro', label: 'Miro', src: '/icons/tools/miro.svg' },
+  { id: 'yandex-metrica', label: 'Яндекс Метрика', src: '/icons/tools/yandex-metrica.svg' },
+  { id: 'google-analytics', label: 'Google Analytics', src: '/icons/tools/google-analytics.svg' },
+  { id: 'notion', label: 'Notion', src: '/icons/tools/notion.svg' },
   { id: 'jira', label: 'Jira', src: '/icons/tools/jira-3.svg' },
   { id: 'confluence', label: 'Confluence', src: '/icons/tools/Confluence.svg' },
-  { id: 'chatgpt', label: 'ChatGPT', src: '/icons/tools/chatgpt.svg.svg' },
-  { id: 'claude', label: 'Claude', src: '/icons/tools/claude.svg.svg' },
-  { id: 'cursor', label: 'Cursor', src: '/icons/tools/cursor.svg.svg' },
+  { id: 'chatgpt', label: 'ChatGPT', src: '/icons/tools/chatgpt.svg' },
+  { id: 'claude', label: 'Claude', src: '/icons/tools/claude.svg' },
+  { id: 'cursor', label: 'Cursor', src: '/icons/tools/cursor.svg' },
 ].map((tool) => ({ ...tool, src: publicAsset(tool.src) }))
+
+export const aboutTools = toolLogos.flatMap(({ id, label }) => id === 'figma'
+  ? [{ id, label }, { id: 'figma-motion', label: 'Figma Motion' }, { id: 'figjam', label: 'FigJam' }]
+  : [{ id, label }])
 
 export type CaseBlock = {
   kind: string
@@ -108,6 +125,7 @@ export type CaseImage = {
   caption: string
   width: number
   height: number
+  screenCount?: number
 }
 
 export type CaseVideo = {
@@ -130,6 +148,7 @@ export type Project = {
   niche?: string
   document: CaseBlock[]
   figmaUrl?: string
+  /** Homepage-only cover. Case study content must use the existing images/videos. */
   cover?: string
   coverDimensions?: { width: number; height: number }
   images?: Partial<Record<'context' | 'structure' | 'concept' | 'system' | 'final', CaseImage[]>>
@@ -145,7 +164,7 @@ export const projects: Project[] = [
     discipline: 'UX/UI-дизайнер',
     platform: 'Web · Mobile',
     document: [],
-    cover: '/cases/concept/Обложка.png?v=20261001-1154',
+    cover: '/cases/concept/Обложка.png?v=6bad2b766e49',
     coverDimensions: { width: 4584, height: 3438 },
     videos: [
       { id: 'messenger', title: 'Концепт мобильного мессенджера', shortTitle: 'Мессенджер', src: '/cases/concept/1.mp4', poster: '/cases/concept/poster-1.webp', width: 2800, height: 2100 },
@@ -166,7 +185,7 @@ export const projects: Project[] = [
     platform: 'Web · Mobile',
     niche: 'FinTech / Crypto',
     document: caseDocuments['partner-portal'],
-    cover: '/cases/partner-portal/Обложка.png',
+    cover: '/cases/partner-portal/Обложка.png?v=b4b1f39522d9',
     coverDimensions: caseCoverDimensions('partner-portal'),
     images: caseImages['partner-portal'],
   },
@@ -180,7 +199,7 @@ export const projects: Project[] = [
     platform: 'Mobile app',
     niche: 'Fintech / Crypto',
     document: caseDocuments.skywallet,
-    cover: '/cases/skywallet/Обложка.png',
+    cover: '/cases/skywallet/Обложка.png?v=1cf91a9bd5c6',
     coverDimensions: caseCoverDimensions('skywallet'),
     images: caseImages.skywallet,
   },
@@ -194,7 +213,7 @@ export const projects: Project[] = [
     platform: 'Web · Mobile',
     niche: 'TravelTech',
     document: caseDocuments.astoria,
-    cover: '/cases/astoria/Обложка.png',
+    cover: '/cases/astoria/Обложка.png?v=7bdf0731c28e',
     coverDimensions: caseCoverDimensions('astoria'),
     images: caseImages.astoria,
   },
@@ -208,7 +227,7 @@ export const projects: Project[] = [
     platform: 'mobile app · landing',
     niche: 'FemTech / HealthTech',
     document: caseDocuments['womens-health'],
-    cover: '/cases/womens-health/Обложка.png',
+    cover: '/cases/womens-health/Обложка.png?v=a1b38781be77',
     coverDimensions: caseCoverDimensions('womens-health'),
     images: caseImages['womens-health'],
   },
@@ -222,7 +241,7 @@ export const projects: Project[] = [
     platform: 'Mobile app',
     niche: 'TravelTech',
     document: caseDocuments.atlyx,
-    cover: '/cases/atlyx/Обложка.png',
+    cover: '/cases/atlyx/Обложка.png?v=963cfe6f81c1',
     coverDimensions: caseCoverDimensions('atlyx'),
     images: caseImages.atlyx,
   },

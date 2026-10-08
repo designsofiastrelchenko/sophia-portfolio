@@ -1,0 +1,6 @@
+const shortWords = /(?<![\p{L}\p{N}_])(?:в|и|с|к|на|по|из|от|для|о|об|за|под|над|при|без|до|а|но|или|у|во|со)[ \t]+(?=[«"(]?[\p{L}\p{N}][^\s\u00a0]{0,23}(?:[\s\u00a0]|$))/giu
+
+/** Keep short function words with the next word, without binding long tokens. */
+export function bindShortWords(text: string): string {
+  return text.replace(shortWords, word => word.trimEnd() + '\u00a0')
+}

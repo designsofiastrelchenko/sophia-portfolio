@@ -1,9 +1,13 @@
-import { useMemo, useRef } from 'react'
+import { motionTokens } from '../lib/motion'
+import { useMemo, useRef, type CSSProperties } from 'react'
 import { motion, useInView, useReducedMotion } from 'framer-motion'
 import type { CaseVisualSpec, VisualItem } from './CaseVisual'
 import { InlineArrows } from './ArrowIcon'
+import { withoutFinalPeriod } from '../data/caseContent'
 import { diagramHubs, stateCenters, type DiagramMode } from '../data/caseDiagramModes'
 import { DiagramWires, type DiagramEdge } from './DiagramWires'
+import { MobileCaseDiagram } from './MobileCaseDiagram'
+import { bindShortWords } from '../lib/typography'
 
 function DiagramNode({ item, index, visible, reduced, number, tone, subtitle }: {
   item: VisualItem; index: number; visible: boolean; reduced: boolean;
@@ -12,14 +16,14 @@ function DiagramNode({ item, index, visible, reduced, number, tone, subtitle }: 
   return <motion.div className={`case-diagram-node${tone ? ` case-diagram-node--${tone}` : ''}`}
     data-diagram-node={`node-${index}`}
     initial={false}
-    animate={reduced ? undefined : {
-      opacity: visible ? 1 : 0.65,
-      transform: visible ? 'translateY(0px)' : 'translateY(8px)',
+    animate={{
+      opacity: visible || reduced ? 1 : 0,
+      transform: reduced || visible ? 'none' : 'translateY(8px)',
     }}
-    transition={{ duration: 0.38, delay: visible ? index * 0.12 : 0, ease: [0.22, 1, 0.36, 1] }}>
+    transition={{ duration: reduced ? 0 : 0.38, delay: visible && !reduced ? index === 0 ? 0 : .28 + Math.min(index * .035, .16) : 0, ease: motionTokens.ease }}>
     {number && <span className="case-diagram-number">{String(index + 1).padStart(2, '0')}</span>}
     <strong><InlineArrows text={item.label} /></strong>
-    {subtitle && <small>{subtitle}</small>}
+    {subtitle && <small>{bindShortWords(withoutFinalPeriod(subtitle))}</small>}
   </motion.div>
 }
 
@@ -27,7 +31,7 @@ function Explanation({ items }: { items: VisualItem[] }) {
   return <dl className="case-diagram-explanations">
     {items.map((item, index) => <div key={`${item.label}-${index}`}>
       <dt><InlineArrows text={item.label} /></dt>
-      <dd>{item.detail && <InlineArrows text={item.detail} />}{item.note && <span className="case-diagram-note"><InlineArrows text={item.note} /></span>}</dd>
+      <dd>{item.detail && <InlineArrows text={withoutFinalPeriod(item.detail)} />}{item.note && <span className="case-diagram-note"><InlineArrows text={withoutFinalPeriod(item.note)} /></span>}</dd>
     </div>)}
   </dl>
 }
@@ -58,15 +62,15 @@ function FilterStates({ items, visible, reduced }: { items: VisualItem[]; visibl
         <div className="case-diagram-filter-pills" aria-hidden="true">
           <motion.span className="case-diagram-filter-active"
             initial={false}
-            animate={reduced ? undefined : { opacity: visible ? 1 : 0.65, transform: visible ? 'translateY(0px)' : 'translateY(6px)' }}
-            transition={{ duration: 0.26, delay: 0.16 }}>Цена</motion.span>
+            animate={{ opacity: visible ? 1 : 0.65, transform: visible ? 'translateY(0px)' : 'translateY(6px)' }}
+            transition={{ duration: reduced ? 0 : 0.26, delay: reduced ? 0 : 0.16 }}>Цена</motion.span>
           <span>Даты</span><span>Питание</span><span>Звёзды</span><span>Расположение</span><span>Продолжительность</span>
         </div>
         <div className="case-diagram-filter-more">
           <span className="case-diagram-overline">{advanced.label}</span>
           <motion.div className="case-diagram-filter-expanded"
             initial={false} animate={{ opacity: reduced || visible ? 1 : 0.4, transform: reduced || visible ? 'translateY(0px)' : 'translateY(-6px)' }}
-            transition={{ duration: 0.35, delay: visible ? 0.38 : 0, ease: [0.22, 1, 0.36, 1] }}>
+            transition={{ duration: reduced ? 0 : 0.35, delay: visible && !reduced ? 0.38 : 0, ease: [0.22, 1, 0.36, 1] }}>
             <span className="case-diagram-setting-line" /><span className="case-diagram-setting-line" /><span className="case-diagram-setting-line" />
           </motion.div>
         </div>
@@ -76,7 +80,7 @@ function FilterStates({ items, visible, reduced }: { items: VisualItem[]; visibl
         <span className="case-diagram-filter-selected-label">{selected.label}</span>
         <motion.div className="case-diagram-filter-selected" initial={false}
           animate={{ opacity: reduced || visible ? 1 : 0.3, transform: reduced || visible ? 'translateY(0px)' : 'translateY(8px)' }}
-          transition={{ duration: 0.36, delay: visible ? 0.7 : 0, ease: [0.22, 1, 0.36, 1] }}>
+          transition={{ duration: reduced ? 0 : 0.36, delay: visible && !reduced ? 0.7 : 0, ease: [0.22, 1, 0.36, 1] }}>
           <span>Цена <b aria-hidden="true">×</b></span><span>Даты <b aria-hidden="true">×</b></span>
         </motion.div>
         <div className="case-diagram-result-lines" aria-hidden="true"><i /><i /><i /></div>
@@ -108,8 +112,8 @@ function Branch({ visual, visible, reduced }: { visual: CaseVisualSpec; visible:
       </div>)}</div>
       <div className="case-diagram-decision"><DiagramNode item={decision} index={3} visible={visible} reduced={reduced} tone="primary" /></div>
       <div className="case-diagram-branches">
-        <div data-diagram-node="yes"><span className="case-diagram-branch-label">Да</span><strong>{decision.branches?.yes}</strong></div>
-        <div data-diagram-node="no"><span className="case-diagram-branch-label">Нет</span><strong>{decision.branches?.no}</strong><p><InlineArrows text={diagnosis.detail ?? ''} /></p></div>
+        <div data-diagram-node="yes"><span className="case-diagram-branch-label">Да</span><strong>{decision.branches?.yes && bindShortWords(decision.branches.yes)}</strong></div>
+        <div data-diagram-node="no"><span className="case-diagram-branch-label">Нет</span><strong>{decision.branches?.no && bindShortWords(decision.branches.no)}</strong><p><InlineArrows text={withoutFinalPeriod(diagnosis.detail ?? '')} /></p></div>
       </div>
       <Explanation items={lead} />
     </>
@@ -140,7 +144,7 @@ function Architecture({ visual, visible, reduced }: { visual: CaseVisualSpec; vi
   const centerItem = visual.items.find((item) => item.label === center)
   return <>
     <div className="case-diagram-architecture">
-      <div className="case-diagram-hub" data-diagram-node="hub"><strong>{center}</strong>{centerItem?.detail && <small>{centerItem.detail}</small>}</div>
+      <div className="case-diagram-hub" data-diagram-node="hub"><strong>{bindShortWords(center)}</strong>{centerItem?.detail && <small>{centerItem.detail && bindShortWords(withoutFinalPeriod(centerItem.detail))}</small>}</div>
       <div className="case-diagram-hub-nodes">{branches.map((item, index) => <DiagramNode key={item.label} item={item} index={index} visible={visible} reduced={reduced} />)}</div>
     </div>
     {visual.id === 'astoria-cms' && <div className="case-diagram-architecture-end"><strong data-diagram-node="end">Витрина</strong></div>}
@@ -152,7 +156,7 @@ function Convergence({ items, center, visible, reduced }: { items: VisualItem[];
   return <>
     <div className="case-diagram-convergence">
       <div className="case-diagram-convergence-entries">{items.map((item, index) => <DiagramNode key={item.label} item={item} index={index} visible={visible} reduced={reduced} />)}</div>
-      <div className="case-diagram-hub" data-diagram-node="hub"><strong>{center}</strong></div>
+      <div className="case-diagram-hub" data-diagram-node="hub"><strong>{bindShortWords(center)}</strong></div>
     </div>
     <Explanation items={items} />
   </>
@@ -192,15 +196,15 @@ function StatusPairs({ items, visible, reduced }: { items: VisualItem[]; visible
 }
 
 function StateMap({ visual, visible, reduced }: { visual: CaseVisualSpec; visible: boolean; reduced: boolean }) {
-  return <div className="case-diagram-state-map">
-    <div className="case-diagram-state-root" data-diagram-node="hub"><strong>{stateCenters[visual.id]}</strong><span>Варианты состояния</span></div>
+  return <div className="case-diagram-state-map" style={{ '--diagram-target-count': visual.items.length } as CSSProperties}>
+    <div className="case-diagram-state-root" data-diagram-node="hub"><strong>{bindShortWords(stateCenters[visual.id])}</strong><span>Варианты состояния</span></div>
     <div className="case-diagram-state-rail">
       {visual.items.map((item, index) => <motion.div key={item.label} className="case-diagram-state-row" data-diagram-node={`node-${index}`}
         initial={false}
-        animate={reduced ? undefined : { opacity: visible ? 1 : 0.65, transform: visible ? 'translateY(0px)' : 'translateY(8px)' }}
-        transition={{ duration: 0.38, delay: visible ? 0.1 + index * 0.1 : 0, ease: [0.22, 1, 0.36, 1] }}>
-        <strong>{item.label}</strong>
-        <div><span>{item.detail}</span>{item.note && <small>{item.note}</small>}</div>
+        animate={{ opacity: visible ? 1 : 0.65, transform: reduced || visible ? 'none' : 'translateY(8px)' }}
+        transition={{ duration: reduced ? 0 : 0.38, delay: visible && !reduced ? 0.1 + index * 0.1 : 0, ease: [0.22, 1, 0.36, 1] }}>
+        <strong>{bindShortWords(item.label)}</strong>
+        <div><span>{item.detail && bindShortWords(withoutFinalPeriod(item.detail))}</span>{item.note && <small>{item.note && bindShortWords(withoutFinalPeriod(item.note))}</small>}</div>
       </motion.div>)}
     </div>
   </div>
@@ -215,10 +219,10 @@ function EntityMap({ items, visible, reduced }: { items: VisualItem[]; visible: 
   return <div className="case-diagram-entity-map" aria-label="Сущности в контексте отправки: кошелёк и аккаунт, сеть и актив, адрес">
     {groups.map((group, index) => <div className="case-diagram-entity-group" key={group.title}>
       <motion.div className="case-diagram-entity-lane" data-diagram-node={`node-${index}`} initial={false}
-        animate={reduced ? undefined : { opacity: visible ? 1 : 0.65, transform: visible ? 'translateY(0px)' : 'translateY(8px)' }}
-        transition={{ duration: 0.38, delay: visible ? index * 0.14 : 0, ease: [0.22, 1, 0.36, 1] }}>
+        animate={{ opacity: visible ? 1 : 0.65, transform: reduced || visible ? 'none' : 'translateY(8px)' }}
+        transition={{ duration: reduced ? 0 : 0.38, delay: visible && !reduced ? index * 0.14 : 0, ease: [0.22, 1, 0.36, 1] }}>
         <span className="case-diagram-overline">{group.title}</span>
-        {group.entries.map((item) => <div key={item.label} className="case-diagram-entity-term"><strong>{item.label}</strong><span>{item.detail}</span></div>)}
+        {group.entries.map((item) => <div key={item.label} className="case-diagram-entity-term"><strong>{bindShortWords(item.label)}</strong><span>{item.detail && bindShortWords(withoutFinalPeriod(item.detail))}</span></div>)}
       </motion.div>
     </div>)}
   </div>
@@ -229,9 +233,9 @@ function RiskMap({ items, visible, reduced }: { items: VisualItem[]; visible: bo
     <div className="case-diagram-risk-heading"><span>Источник риска</span><span>Возможное последствие</span></div>
     {items.map((item, index) => <motion.div className="case-diagram-risk-row" key={item.label}
       initial={false}
-      animate={reduced ? undefined : { opacity: visible ? 1 : 0.65, transform: visible ? 'translateY(0px)' : 'translateY(8px)' }}
-      transition={{ duration: 0.38, delay: visible ? index * 0.1 : 0, ease: [0.22, 1, 0.36, 1] }}>
-      <strong data-diagram-node={`risk-source-${index}`}>{item.label}</strong><p data-diagram-node={`risk-target-${index}`}>{item.detail}</p>
+      animate={{ opacity: visible ? 1 : 0.65, transform: reduced || visible ? 'none' : 'translateY(8px)' }}
+      transition={{ duration: reduced ? 0 : 0.38, delay: visible && !reduced ? index * 0.1 : 0, ease: [0.22, 1, 0.36, 1] }}>
+      <strong data-diagram-node={`risk-source-${index}`}>{bindShortWords(item.label)}</strong><p data-diagram-node={`risk-target-${index}`}>{item.detail && bindShortWords(withoutFinalPeriod(item.detail))}</p>
     </motion.div>)}
   </div>
 }
@@ -242,10 +246,10 @@ function ChangeList({ items, visible, reduced }: { items: VisualItem[]; visible:
       const [before, after] = item.label.split('→').map((text) => text.trim())
       return <motion.div className="case-diagram-change-row" key={item.label}
         initial={false}
-        animate={reduced ? undefined : { opacity: visible ? 1 : 0.65, transform: visible ? 'translateY(0px)' : 'translateY(8px)' }}
-        transition={{ duration: 0.38, delay: visible ? index * 0.14 : 0, ease: [0.22, 1, 0.36, 1] }}>
-        <span data-diagram-node={`before-${index}`}>{before}</span><strong data-diagram-node={`after-${index}`}>{after}</strong>
-        <p>{item.detail}</p>
+        animate={{ opacity: visible ? 1 : 0.65, transform: reduced || visible ? 'none' : 'translateY(8px)' }}
+        transition={{ duration: reduced ? 0 : 0.38, delay: visible && !reduced ? index * 0.14 : 0, ease: [0.22, 1, 0.36, 1] }}>
+        <span data-diagram-node={`before-${index}`}>{bindShortWords(before)}</span><strong data-diagram-node={`after-${index}`}>{bindShortWords(after)}</strong>
+        <p>{item.detail && bindShortWords(withoutFinalPeriod(item.detail))}</p>
       </motion.div>
     })}
   </div>
@@ -297,6 +301,7 @@ export function CaseDiagram({ visual, mode }: { visual: CaseVisualSpec; mode: Di
   const visible = reduced || inView
   const edges = useMemo(() => diagramEdges(visual, mode), [visual, mode])
   return <div ref={ref} className={`case-diagram case-diagram--${mode}`}>
+    <MobileCaseDiagram visual={visual} mode={mode} visible={visible} />
     {mode === 'service-map' && <ServiceMap items={visual.items} visible={visible} reduced={reduced} />}
     {mode === 'filters' && <FilterStates items={visual.items} visible={visible} reduced={reduced} />}
     {mode === 'route' && <Route visual={visual} visible={visible} reduced={reduced} />}

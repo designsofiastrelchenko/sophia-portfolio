@@ -1,5 +1,7 @@
 import { useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { animate } from 'framer-motion'
+import { motionTokens, revealTransform, revealIdentity } from '../lib/motion'
 
 type RevealKind = 'intro' | 'avatar' | 'logo' | 'card' | 'image' | 'case-cover' | 'text' | 'table' | 'accordion-row' | 'case-intro' | 'fact' | 'result' | 'award-art' | 'award-text'
 
@@ -18,6 +20,7 @@ export function ScrollReveals() {
     const targetsByBlock = new Map<HTMLElement, Element[]>()
     const markers: HTMLElement[] = []
     const pendingBlocks = new Set<HTMLElement>()
+    const animations = new Map<HTMLElement, { stop: () => void }>()
     let observer: IntersectionObserver | undefined
     let firstFrame = 0
     let secondFrame = 0
@@ -30,6 +33,20 @@ export function ScrollReveals() {
       pendingBlocks.delete(block)
       block.style.setProperty('--reveal-delay', `${delay}ms`)
       block.dataset.revealState = 'visible'
+      block.dataset.motionManaged = 'true'
+      animations.get(block)?.stop()
+      const kind = revealKind(block)
+      const preset = ['image', 'case-cover', 'avatar'].includes(kind) ? 'scale'
+        : kind === 'result' ? 'soft' : block.tagName === 'H2' ? 'fade' : 'soft'
+      if (instant || media.matches) {
+        block.style.opacity = '1'; block.style.transform = 'none'
+      } else {
+        const adaptive = window.matchMedia('(max-width: 1100px)').matches
+        animations.set(block, animate(block, {
+          opacity: [0, 1], transform: [revealTransform(preset, adaptive ? 8 : 16), revealIdentity(preset)],
+        }, { duration: adaptive ? motionTokens.adaptiveReveal : motionTokens.reveal,
+          delay: Math.min(delay / 1000, .24), ease: motionTokens.ease }))
+      }
       targetsByBlock.get(block)?.forEach((target) => observer?.unobserve(target))
     }
 
@@ -43,6 +60,8 @@ export function ScrollReveals() {
 
     const start = () => {
       observer?.disconnect()
+      animations.forEach(animation => animation.stop())
+      blocks.filter(block => block.dataset.motionManaged && block.dataset.revealState === 'visible').forEach(block => { block.style.opacity = '1'; block.style.transform = 'none' })
       removePassed()
       cancelAnimationFrame(firstFrame)
       cancelAnimationFrame(secondFrame)
@@ -179,6 +198,7 @@ export function ScrollReveals() {
     window.addEventListener('popstate', revealHash)
 
     return () => {
+      animations.forEach(animation => animation.stop())
       observer?.disconnect()
       removePassed()
       cancelAnimationFrame(firstFrame)

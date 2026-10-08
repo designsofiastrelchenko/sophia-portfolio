@@ -1,16 +1,16 @@
 import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { Footer } from '../components/Footer'
-import { Icon } from '../components/Icon'
+import { BackButton } from '../components/BackButton'
 import { profile } from '../data/portfolio'
 import { trackEvent } from '../lib/analytics'
+import { Typography } from '../components/Typography'
 
 export function CopyrightPage() {
   useEffect(() => { document.title = `Авторские права — ${profile.name}` }, [])
 
   return (
-    <main className="copyright-page" id="main-content" tabIndex={-1}>
-      <Link className="icon-action back-link copyright-back" to="/" aria-label="На главную" title="На главную"><span className="icon-motion"><Icon name="back" /></span></Link>
+    <Typography><main className="copyright-page" id="main-content" tabIndex={-1}>
+      <BackButton to="/" />
       <article className="copyright-document">
         <h1>Уведомление об авторских правах на материалы портфолио</h1>
 
@@ -62,6 +62,6 @@ export function CopyrightPage() {
         <p className="copyright-updated">Дата последнего обновления документа: 01.10.2026.</p>
       </article>
       <Footer />
-    </main>
+    </main></Typography>
   )
 }

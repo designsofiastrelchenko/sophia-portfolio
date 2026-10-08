@@ -1,43 +1,64 @@
+import { motionTokens, useMotionSystem } from '../lib/motion'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutGroup, motion, useReducedMotion } from 'framer-motion'
-import { caseSections, projects } from '../data/portfolio'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { projects, profile } from '../data/portfolio'
+import { getCaseNavigationSections } from '../data/caseContent'
+import { bindShortWords } from '../lib/typography'
+import { TelegramLink } from './ContactLinks'
+import { trackEvent } from '../lib/analytics'
 import { publicAsset } from '../lib/publicAsset'
 import { Icon } from './Icon'
+import { scrollToCanvasTarget } from '../lib/canvasNavigation'
+import { useAdaptivePress } from '../lib/useAdaptivePress'
+
+const MotionLink = motion.create(Link)
 
 const homeLinks = [
-  { href: '/#profile', label: 'Обо мне' },
-  { href: '/#experience', label: 'Опыт работы' },
-  { href: '/#education', label: 'Образование и курсы' },
   { href: '/#work', label: 'Проекты' },
+  { href: '/#about', label: 'Обо мне' },
 ]
 
 export function MobileHeader() {
+  const { variants, hoverLift, navHover } = useMotionSystem()
   const { pathname, search } = useLocation()
   const [openFor, setOpenFor] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState('')
   const reducedMotion = useReducedMotion()
+  const press = useAdaptivePress()
   const menuKey = pathname + search
   const open = openFor === menuKey
   const headerRef = useRef<HTMLElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const isCase = pathname.startsWith('/projects/')
-  const isConcept = pathname === '/projects/concepts'
   const isShort = new URLSearchParams(search).get('version') === 'short'
-  const sections = useMemo(() => isConcept
-    ? projects[0].videos?.map(({ id, shortTitle }) => ({ id, label: shortTitle })) ?? []
-    : caseSections.filter(({ id }) => !isShort || id === 'context' || id === 'final'),
-  [isConcept, isShort])
+  const sections = useMemo(() => {
+    const project = projects.find(project => pathname === `/projects/${project.id}`)
+    return project ? getCaseNavigationSections(project, isShort) : []
+  }, [pathname, isShort])
+  const isActiveLink = (href: string) => href.includes('#')
+    ? pathname === '/' && activeSection === href.split('#')[1]
+    : pathname === href
 
   useEffect(() => {
     const ids = isCase
       ? sections.map(({ id }) => id)
-      : homeLinks.map(({ href }) => href.split('#')[1])
+      : homeLinks.filter(({ href }) => href.includes('#')).map(({ href }) => href.split('#')[1])
     let frame = 0
     const update = () => {
       frame = 0
-      const line = (headerRef.current?.getBoundingClientRect().bottom ?? 0) + 24
+      const canvas = document.querySelector('.home-canvas[data-horizontal="true"]')
+      if (!isCase && canvas) {
+        const first = canvas.querySelector<HTMLElement>('[data-project]')
+        const about = canvas.querySelector<HTMLElement>('#about')
+        const next = canvas.querySelector<HTMLElement>('[data-project="partner-portal"]')
+        const center = document.documentElement.clientWidth / 2
+        const inAbout = about && about.getBoundingClientRect().left <= center && next && next.getBoundingClientRect().left > center
+        setActiveSection(inAbout ? 'about' : first && first.getBoundingClientRect().left <= center ? 'work' : '')
+        return
+      }
+      const line = (headerRef.current?.getBoundingClientRect().bottom ?? 0) + 36
       const targets = ids.flatMap((id) => {
         const element = document.getElementById(id)
         return element ? [{ id, top: element.getBoundingClientRect().top }] : []
@@ -59,7 +80,7 @@ export function MobileHeader() {
 
   useEffect(() => {
     if (!open) return
-    const mobile = window.matchMedia('(max-width: 760px)')
+    const mobile = window.matchMedia('(max-width: 1100px)')
     if (!mobile.matches) return
     const rootOverflow = document.documentElement.style.overflow
     document.documentElement.style.overflow = 'hidden'
@@ -75,6 +96,13 @@ export function MobileHeader() {
       if (event.key === 'Escape') {
         setOpenFor(null)
         buttonRef.current?.focus()
+      }
+      if (event.key === 'Tab') {
+        const links = headerRef.current?.querySelectorAll<HTMLElement>('.mobile-header-inner a, .mobile-header-inner button, .mobile-menu a')
+        const first = links?.[0]
+        const last = links?.[links.length - 1]
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
       }
     }
     document.addEventListener('pointerdown', onPointerDown)
@@ -97,27 +125,41 @@ export function MobileHeader() {
       if (!section) return
       section.tabIndex = -1
       section.focus({ preventScroll: true })
+      if (!isCase && !scrollToCanvasTarget(section, reducedMotion ? 'instant' : 'smooth'))
+        section.scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth' })
     })
   }
 
   return (
-    <header className="mobile-header" ref={headerRef}>
-      <div className="mobile-menu-backdrop" data-open={open} aria-hidden="true" onClick={() => setOpenFor(null)} />
+    <motion.header initial="hidden" animate="visible" variants={variants('fade')} className={`site-header mobile-header${pathname === '/' ? ' site-header--home' : ''}`} ref={headerRef}>
+      <div className="desktop-header">
+        <nav className="header-navigation" aria-label="Главная навигация">
+          {homeLinks.map(link => <MotionLink style={{ transform: 'translateY(0px) scale(1)' }} whileHover={navHover} whileTap={hoverLift.whileTap} transition={hoverLift.transition} key={link.href} to={link.href}
+            onClick={event => {
+              if (link.href.includes('#') && pathname === '/' && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey)
+                setOpenFor(null)
+            }}
+            aria-current={isActiveLink(link.href) ? (link.href.includes('#') ? 'location' : 'page') : undefined}>{bindShortWords(link.label)}</MotionLink>)}
+          <motion.a whileTap={hoverLift.whileTap} transition={hoverLift.transition} href={profile.cv} target="_blank" rel="noreferrer" onClick={() => trackEvent('resume_click', { location: 'header' })}>CV</motion.a>
+        </nav>
+        <div className="header-actions">
+          <TelegramLink location="header" label="TG" />
+        </div>
+      </div>
+      <AnimatePresence>{open && <motion.div className="mobile-menu-backdrop" data-open="true" aria-hidden="true"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .18 }} onClick={() => setOpenFor(null)} />}</AnimatePresence>
       <div className={`mobile-header-inner${isCase ? ' mobile-header-inner--case' : ' mobile-header-inner--home'}`}>
-        {isCase ? (
-          <Link className="icon-action mobile-header-back" to="/" aria-label="Назад к проектам" onClick={() => setOpenFor(null)}>
-            <Icon name="arrow-left" />
-          </Link>
-        ) : null}
         <Link
           className="mobile-brand"
           to="/"
           aria-label="На главную"
           onClick={() => setOpenFor(null)}
         >
-          <img src={publicAsset('icons/favicon/Logo 64 — Light.svg')} alt="" width="40" height="40" />
+          <img src={publicAsset('icons/favicon/Logo 64 — Light.svg')} alt="" width="32" height="32" />
+          <span>{profile.name}</span>
         </Link>
-        <button
+        <TelegramLink location="mobile-header" compact />
+        <motion.button {...press}
           className="icon-action mobile-menu-toggle"
           type="button"
           ref={buttonRef}
@@ -127,58 +169,55 @@ export function MobileHeader() {
           onClick={() => setOpenFor(open ? null : menuKey)}
         >
           <Icon name={open ? 'close' : 'menu'} />
-        </button>
+        </motion.button>
       </div>
-      <nav
+      <motion.nav
         id="mobile-menu"
         className="mobile-menu"
         aria-label="Мобильное меню"
         data-open={open}
         aria-hidden={!open}
         inert={!open}
+        initial={false}
+        animate={{ opacity: open ? 1 : 0, transform: reducedMotion ? 'none' : open ? 'translateY(0px)' : 'translateY(-6px)' }}
+        transition={{ duration: reducedMotion ? .1 : motionTokens.menu, ease: motionTokens.ease }}
       >
-        <LayoutGroup id={`mobile-menu-${pathname}`}>
         {isCase ? (
           <>
-            <Link to="/" onClick={() => setOpenFor(null)} style={{ '--menu-order': 0 } as CSSProperties}>
-              <span className="mobile-menu-link-label">Все проекты</span>
-            </Link>
-            {sections.length > 0 && <span className="mobile-menu-label" style={{ '--menu-order': 1 } as CSSProperties}>Разделы кейса</span>}
+            <MotionLink to="/" onClick={() => setOpenFor(null)} style={{ '--menu-order': 0 } as CSSProperties}>
+              <span className="mobile-menu-link-label">Проекты</span>
+            </MotionLink>
+            <MotionLink to="/#about" onClick={() => setOpenFor(null)} style={{ '--menu-order': 1 } as CSSProperties}>
+              <span className="mobile-menu-link-label">Обо мне</span>
+            </MotionLink>
+            {sections.length > 0 && <span className="mobile-menu-label" style={{ '--menu-order': 2 } as CSSProperties}>Разделы кейса</span>}
             {sections.map((section, index) => (
               <a
                 key={section.id}
                 href={`#${section.id}`}
                 aria-current={activeSection === section.id ? 'location' : undefined}
                 onClick={() => closeAtSection(section.id)}
-                style={{ '--menu-order': index + 2 } as CSSProperties}
+                style={{ '--menu-order': index + 3 } as CSSProperties}
               >
-                {activeSection === section.id && (
-                  <motion.span className="mobile-menu-active-marker" layoutId="activeSection" aria-hidden="true"
-                    transition={reducedMotion ? { duration: 0 } : { type: 'spring', duration: 0.5, bounce: 0.2 }}>{section.label}</motion.span>
-                )}
-                <span className="mobile-menu-link-label">{section.label}</span>
+                <span className="mobile-menu-link-label">{bindShortWords(section.label)}</span>
               </a>
             ))}
           </>
         ) : (
           homeLinks.map((link, index) => (
-            <Link
+            <MotionLink initial={false} animate={{ opacity: open ? 1 : 0, transform: reducedMotion || open ? 'none' : 'translateY(-4px)' }} transition={{ duration: .18, delay: open && !reducedMotion ? index * .04 : 0 }}
               key={link.href}
               to={link.href}
-              aria-current={activeSection === link.href.split('#')[1] ? 'location' : undefined}
-              onClick={() => closeAtSection(link.href.split('#')[1])}
+              aria-current={isActiveLink(link.href) ? (link.href.includes('#') ? 'location' : 'page') : undefined}
+              onClick={() => setOpenFor(null)}
               style={{ '--menu-order': index } as CSSProperties}
             >
-              {activeSection === link.href.split('#')[1] && (
-                <motion.span className="mobile-menu-active-marker" layoutId="activeSection" aria-hidden="true"
-                  transition={reducedMotion ? { duration: 0 } : { type: 'spring', duration: 0.5, bounce: 0.2 }}>{link.label}</motion.span>
-              )}
-              <span className="mobile-menu-link-label">{link.label}</span>
-            </Link>
+              <span className="mobile-menu-link-label">{bindShortWords(link.label)}</span>
+            </MotionLink>
           ))
         )}
-        </LayoutGroup>
-      </nav>
-    </header>
+        <motion.a whileTap={hoverLift.whileTap} initial={false} animate={{ opacity: open ? 1 : 0, transform: reducedMotion || open ? 'translateY(0px)' : 'translateY(-4px)' }} transition={{ duration: .18, delay: open && !reducedMotion ? .08 : 0 }} href={profile.cv} target="_blank" rel="noreferrer" onClick={() => trackEvent('resume_click', { location: 'mobile-menu' })}><span className="mobile-menu-link-label">CV</span></motion.a>
+      </motion.nav>
+    </motion.header>
   )
 }

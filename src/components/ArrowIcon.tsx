@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
+import { bindShortWords } from '../lib/typography'
 
 type Direction = 'right' | 'left' | 'up' | 'down' | 'up-right'
 
@@ -71,7 +72,7 @@ export function ArrowIcon({ direction = 'right', decorative = false, className =
 }
 
 export function InlineArrows({ text }: { text: string }) {
-  return text.split(/([→←↑↓↗])/g).map((part, index) => {
+  return bindShortWords(text).split(/([→←↑↓↗])/g).map((part, index) => {
     const direction = directionByCharacter[part]
     return <Fragment key={index}>{direction ? <ArrowIcon direction={direction} className="arrow-icon--inline" /> : part}</Fragment>
   })

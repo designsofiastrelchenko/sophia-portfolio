@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import { bindShortWords } from '../lib/typography'
 
 function MetaCross() {
   return (
@@ -10,7 +11,7 @@ function MetaCross() {
 
 export function MetaSeparatedText({ value, separator = 'dot' }: { value: string; separator?: 'dot' | 'slash' }) {
   const parts = value.split(separator === 'slash' ? /\s*\/\s*/ : /\s+[•·]\s+/).filter(Boolean)
-  if (parts.length < 2) return value
+  if (parts.length < 2) return bindShortWords(value)
 
   return (
     <span className="meta-separated">
@@ -19,7 +20,7 @@ export function MetaSeparatedText({ value, separator = 'dot' }: { value: string;
         {parts.map((part, index) => (
           <Fragment key={`${part}-${index}`}>
             {index > 0 ? <MetaCross /> : null}
-            <span>{part}</span>
+            <span>{bindShortWords(part)}</span>
           </Fragment>
         ))}
       </span>

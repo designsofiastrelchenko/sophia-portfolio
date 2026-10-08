@@ -1,3 +1,6 @@
+import { motion } from 'framer-motion'
+import { useAdaptivePress } from '../lib/useAdaptivePress'
+
 type Option = { value: string; label: string }
 
 export function SegmentedControl({
@@ -13,6 +16,7 @@ export function SegmentedControl({
   controls: string
   onChange: (value: string) => void
 }) {
+  const press = useAdaptivePress()
   return (
     <div
       className="segmented-group version-switch"
@@ -20,7 +24,7 @@ export function SegmentedControl({
       aria-label={label}
     >
       {options.map((option) => (
-        <button
+        <motion.button {...press} transition={{ duration: .14 }}
           key={option.value}
           type="button"
           aria-pressed={value === option.value}
@@ -28,7 +32,7 @@ export function SegmentedControl({
           onClick={() => onChange(option.value)}
         >
           {option.label}
-        </button>
+        </motion.button>
       ))}
     </div>
   )

@@ -1,25 +1,33 @@
 :root {
   color-scheme: light;
-  --color-page: #fff;
-  --color-surface: #f7f7f7;
-  --color-tile: #ededed;
-  --color-text: #292929;
+  --color-page: #f3f3f5;
+  --color-white: #fff;
+  --header-height: max(104px, 13.3dvh);
+  --color-surface: #e9e9ec;
+  --color-tile: #ededf0;
+  --color-dark: #1d1d1b;
+  --color-on-dark: #f7f7f5;
+  --color-muted-on-dark: #b7b7b2;
+  --color-text: #202020;
   --color-muted: #666666;
   --color-meta-separator: #a0a0a0;
   --color-avatar: #d8d8d6;
-  --color-border: #e8e8e8;
-  --divider-rule: 1px dashed var(--color-border);
+  --color-border: #dcdcdf;
   --color-action: #202020;
-  --color-action-hover: #3b3b3b;
+  --color-action-hover: #3c3c3c;
   --color-action-pressed: #505050;
-  --color-accent: #5544ee;
+  --color-social-telegram: #229ed9;
+  --color-social-linkedin: #0a66c2;
+  --color-social-email: #505050;
+  --color-accent-soft: #e4e4e4;
+  --color-accent-soft-hover: #dddddd;
   --font-sans: 'Onest', Arial, sans-serif;
-  --type-body: 16px;
+  --type-body: 18px;
   --leading-body: 1.5;
   --type-caption: 16px;
   --type-note: 13px;
   --type-button: 14px;
-  --type-section: 32px;
+  --type-section: 52px;
   --type-card-title: 18px;
   --weight-regular: 400;
   --weight-medium: 500;
@@ -27,13 +35,32 @@
   --radius-surface-outer: 48px;
   --radius-surface-inner: calc(var(--radius-surface-outer) - var(--surface-inset));
   --radius-content-card: 24px;
+  --radius-media: 40px;
+  --radius-scene: 56px;
+  --scene-light: var(--color-white);
+  --scene-muted: var(--color-surface);
+  --canvas-scene-width: 61vw;
+  --canvas-gutter: 5vw;
+  --canvas-scene-height: 74dvh;
+  --radius-logo: 18px;
+  --section-padding: 56px;
+  --section-gap: 120px;
+  --case-content-width: 1120px;
+  --case-reading-width: 800px;
+  --case-group-gap: 32px;
+  --diagram-stroke: 1.6;
+  --diagram-port-gap: 8;
+  --diagram-arrow-size: 7;
   --surface-inset: 8px;
   --icon-size: 18px;
-  --action-height: 44px;
-  --action-radius: 20px;
+  --action-height: 56px;
+  --action-radius: 28px;
+  --action-padding-y: 16px;
+  --action-padding-x: 24px;
+  --radius-navigation: 999px;
   --radius-inner: 4px;
   --radius-small: 8px;
-  --radius-control: 12px;
+  --radius-control: 16px;
   --radius-group: 16px;
   --radius-card: 16px;
   --radius-shell: 24px;
@@ -57,10 +84,17 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@media (max-width: 1100px) {
+  :root { --header-height: 68px; --radius-scene: 32px; }
+}
 @media (max-width: 760px) {
   :root {
     --radius-surface-outer: 32px;
     --radius-content-card: 20px;
-    --type-section: 24px;
+    --radius-media: 24px;
+    --type-section: 34px;
+    --type-body: 16px;
+    --section-padding: 24px;
+    --section-gap: 64px;
   }
 }

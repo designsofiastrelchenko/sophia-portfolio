@@ -5,7 +5,7 @@ export type CaseGroupId = 'context' | 'structure' | 'concept' | 'system' | 'fina
 export type CaseNode =
   | { kind: 'heading'; text: string; level: 3 | 4 }
   | { kind: 'paragraph'; text: string }
-  | { kind: 'list'; items: string[] }
+  | { kind: 'list'; items: string[]; ordered?: boolean }
 
 export type CaseGroup = {
   id: CaseGroupId
@@ -16,7 +16,8 @@ export type CaseGroup = {
 export function withoutFinalPeriod(text: string) {
   const trimmed = text.trimEnd()
   if (!trimmed.endsWith('.') || /\.\.{1,}$/.test(trimmed) ||
-    /(?:\p{L}\.\s*\p{L}\.|(?:^|\s)(?:\p{L}|млн|млрд|тыс|руб|см)\.)$/iu.test(trimmed))
+    /(?:^|\s)\p{Lu}\.$/u.test(trimmed) ||
+    /(?:\p{L}\.\s*\p{L}\.|(?:^|\s)(?:г|гг|п|с|д|т|ч|л|м|млн|млрд|тыс|руб|см|др|пр|стр|рис|табл|пп|коп|чел|мин|сек|напр|etc|vs)\.)$/iu.test(trimmed))
     return text
   return trimmed.slice(0, -1) + text.slice(trimmed.length)
 }
@@ -61,11 +62,22 @@ const introducingLines = new Set([
   'Структура кабинета объединяет несколько самостоятельных пользовательских путей',
 ])
 
+const orderedTopics = new Set([
+  'Контроль работы обменника', 'Поиск и проверка ордера',
+  'Диагностика интеграции', 'Изменение комиссии', 'Управление активами',
+  'Отправка средств', 'Получение средств', 'Обмен',
+])
+
 function appendList(nodes: CaseNode[], items: string[]) {
   if (!items.length) return
   const previous = nodes[nodes.length - 1]
   if (previous?.kind === 'list') previous.items.push(...items)
-  else nodes.push({ kind: 'list', items })
+  else {
+    const heading = nodes.findLast(node => node.kind === 'heading')
+    // These source topics describe ordered actions, rather than categories or findings.
+    const ordered = heading?.kind === 'heading' && orderedTopics.has(heading.text.trim())
+    nodes.push({ kind: 'list', items, ordered })
+  }
 }
 
 function appendBlock(nodes: CaseNode[], block: CaseBlock) {
@@ -80,6 +92,11 @@ function appendBlock(nodes: CaseNode[], block: CaseBlock) {
 
   const lines = block.text.split('\n').map((line) => line.trim()).filter(Boolean)
   if (!lines.length) return
+  // Arrow-delimited source paths are explicit sequences; findings stay unordered.
+  if (lines.length > 1 && lines.slice(1).every(line => line.startsWith('→'))) {
+    nodes.push({ kind: 'list', ordered: true, items: lines.map(line => line.replace(/^→\s*/, '')) })
+    return
+  }
   const prose: string[] = []
   const bullets: string[] = []
   for (const line of lines) {
@@ -126,4 +143,12 @@ export function getCaseGroups(project: Project): CaseGroup[] {
     )
   }
   return groups.filter((group) => group.nodes.length > 0)
+}
+
+export function getCaseNavigationSections(project: Project, isShort = false) {
+  if (project.videos) return project.videos.map(video => ({ id: video.id, label: video.shortTitle }))
+  const groups = getCaseGroups(project).filter(group => !isShort || group.id === 'context' || group.id === 'final')
+  const reflection = groups.flatMap(group => group.nodes).find(node => node.kind === 'heading' && node.text.startsWith('Рефлексия'))
+  return [{ id: 'overview', label: 'О проекте' }, ...groups.map(group => ({ id: group.id, label: group.title })),
+    ...(reflection?.kind === 'heading' ? [{ id: 'reflection', label: reflection.text }] : [])]
 }

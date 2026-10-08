@@ -1,19 +1,13 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
-import { education, experience, profile, toolLogos } from '../data/portfolio'
+import { motion } from 'framer-motion'
+import { aboutPresentation, aboutTools, education, experience, profile, toolLogos } from '../data/portfolio'
 import type { Experience } from '../data/portfolio'
 import { Icon } from './Icon'
+import { SocialIconLinks, TelegramLink } from './ContactLinks'
 import { MetaSeparatedText } from './MetaSeparatedText'
-import { trackEvent } from '../lib/analytics'
 import { publicAsset } from '../lib/publicAsset'
-
-function ResumeDivider() {
-  return <span className="resume-divider" aria-hidden="true">
-    <span className="resume-divider-line" />
-    <span className="resume-divider-notch resume-divider-notch--left" />
-    <span className="resume-divider-notch resume-divider-notch--right" />
-  </span>
-}
+import { Footer } from './Footer'
+import { Typography } from './Typography'
+import { useMotionSystem } from '../lib/motion'
 
 function ToolsStrip() {
   return (
@@ -38,9 +32,10 @@ function ToolsStrip() {
   )
 }
 
-function ResumeEntry({ item, last }: { item: Experience; last: boolean }) {
+function ResumeEntry({ item }: { item: Experience }) {
+  const Heading = item.projects?.length ? 'h2' : 'h3'
   return (
-    <li>
+    <Typography><li>
           <div className="resume-entry-intro">
             <span className={`company-logo${item.company === 'Contented' ? ' company-logo--contented' : ''}`} aria-hidden="true">
               {item.logo ? (
@@ -48,8 +43,8 @@ function ResumeEntry({ item, last }: { item: Experience; last: boolean }) {
               ) : null}
             </span>
             <div className="resume-entry-details">
-              <h3>{item.company}</h3>
-              <p className="resume-entry-role">{item.role}</p>
+              <Heading>{item.role}</Heading>
+              <p className="resume-entry-company">{item.company}</p>
               <p className="resume-entry-period">{item.period}</p>
               {item.summary ? <p className="resume-entry-summary">{item.summary}</p> : null}
             </div>
@@ -61,209 +56,108 @@ function ResumeEntry({ item, last }: { item: Experience; last: boolean }) {
             ) : null}
           </div>
           {item.projects?.length ? (
-            <div className="resume-projects">
+              <div className="resume-projects">
               {item.projects.map((project, index) => (
                 <article className="resume-project" key={project.title}>
-                  <h4>{index + 1}. {project.title.replace(/^\d+\.\s*/, '')}</h4>
-                  <h5>Результат</h5>
+                  <h3 className="resume-project-title">{index + 1}. {project.title.replace(/^\d+\.\s*/, '')}</h3>
+                  <h4 className="resume-project-topic">Результат</h4>
                   <ul className="star-list" role="list">{project.results.map((result) => <li key={result}>{result}</li>)}</ul>
-                  <h5>Проблема</h5>
+                  <h4 className="resume-project-topic">Проблема</h4>
                   <p>{project.problem}</p>
-                  <h5>Решение</h5>
+                  <h4 className="resume-project-topic">Решение</h4>
                   <p>{project.solution}</p>
                 </article>
               ))}
-            </div>
+              </div>
           ) : null}
-          {!last ? <ResumeDivider /> : null}
-    </li>
+    </li></Typography>
   )
 }
 
 function ResumeEntries({ items }: { items: Experience[] }) {
   return (
     <ol className="resume-entries">
-      {items.map((item, index) => <ResumeEntry key={item.company} item={item} last={index === items.length - 1} />)}
+      {items.map((item) => <ResumeEntry key={item.company} item={item} />)}
     </ol>
   )
 }
 
-type AccordionProps = {
-  id: string
-  title: string
-  items: Experience[]
-  open: boolean
-  onToggle: (button: HTMLButtonElement) => void
-  onCollapsed: () => void
+export function ProfileHero() {
+  const { variants } = useMotionSystem()
+  return <section className="profile-hero" data-canvas-panel aria-labelledby="hero-title">
+    <motion.div className="hero-copy" initial="hidden" animate="visible">
+      <motion.div className="hero-identity" variants={variants('fade', .04)}>
+        <p>{profile.name}</p>
+      </motion.div>
+      <motion.h1 id="hero-title" className="profile-role">
+        <motion.span className="hero-headline-line" variants={variants('left', 0.120)}>UX/UI&nbsp;&amp;&nbsp;Product дизайнер</motion.span>{' '}
+        <motion.span className="hero-headline-line" variants={variants('left', 0.185)}>с&nbsp;опытом в&nbsp;финтехе,</motion.span>{' '}
+        <motion.span className="hero-headline-line" variants={variants('left', 0.250)}>цифровых экосистемах</motion.span>{' '}
+        <motion.span className="hero-headline-line" variants={variants('left', 0.315)}>и&nbsp;B2B/B2C‑продуктах</motion.span>
+      </motion.h1>
+      <motion.div className="hero-links" variants={variants('soft', .34)}><SocialIconLinks location="hero" /></motion.div>
+      <motion.p className="hero-location" variants={variants('fade', .4)}><MetaSeparatedText value={profile.location} /></motion.p>
+    </motion.div>
+    <div className="hero-visual">
+      <motion.div className="profile-avatar" initial="hidden" animate="visible" variants={variants('scale', .18)}>
+        <img src={publicAsset('cases/avatar.jpg')} alt={`Фото ${profile.name}`} width="400" height="400" decoding="async" fetchPriority="high" />
+      </motion.div>
+    </div>
+  </section>
 }
 
-function ResumeAccordion({ id, title, items, open, onToggle, onCollapsed }: AccordionProps) {
-  const hiddenCount = Math.max(0, items.length - 2)
-  const toggleRef = useRef<HTMLButtonElement>(null)
-  const foldRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
+export function ProfileAbout() {
+  const { variants, hoverLift } = useMotionSystem()
+  return <Typography><motion.section className="profile-about" id="about" data-canvas-panel aria-label="Обо мне"
+    initial="hidden" whileInView="visible" viewport={{ once: true, amount: .08 }}>
+    <div className="about-intro">
+    <motion.h2 id="about-title" className="about-statement" variants={variants('fade')}>
+      {aboutPresentation.statement} <span>{aboutPresentation.emphasis}</span>
+    </motion.h2>
+    <motion.p className="about-background" variants={variants('soft', .08)}>{aboutPresentation.background}</motion.p>
+    </div>
+    <motion.div className="about-principles" initial="hidden" whileInView="visible" viewport={{ once: true, amount: .04 }}>
+      {aboutPresentation.principles.map((principle, index) => <motion.div className="about-principle" key={principle.title} variants={variants('soft', .16 + index * .04)}>
+        <h3>{principle.title}</h3>
+        <p>{principle.description}</p>
+      </motion.div>)}
+    </motion.div>
+    <motion.footer className="about-bottom" initial="hidden" whileInView="visible" viewport={{ once: true, amount: .04 }} variants={variants('fade', .12)}>
+      <ul className="about-tool-chips" aria-label="Инструменты">
+        {aboutTools.map(tool => <motion.li key={tool.id} {...hoverLift}>{tool.label}</motion.li>)}
+      </ul>
+    </motion.footer>
+  </motion.section></Typography>
+}
 
-  useLayoutEffect(() => {
-    const fold = foldRef.current
-    const content = contentRef.current
-    if (!fold || !content) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      fold.style.height = open ? 'auto' : '0px'
-      return
-    }
-    fold.style.height = `${fold.getBoundingClientRect().height}px`
-    void fold.offsetHeight
-    fold.style.height = open ? `${content.scrollHeight}px` : '0px'
-    if (!open) return
-    const observer = new ResizeObserver(() => {
-      if (fold.style.height !== 'auto') fold.style.height = `${content.scrollHeight}px`
-    })
-    observer.observe(content)
-    return () => observer.disconnect()
-  }, [open])
-
-  return (
-    <section className={`experience${open ? ' experience--open' : ''}`} id={id} aria-labelledby={`${id}-title`}>
-      <h2 id={`${id}-title`}>{title}</h2>
-      <div className="experience-accordion">
-        <button className="experience-accordion-toggle" type="button" ref={toggleRef}
-          aria-expanded={open} aria-controls={`${id}-accordion-list`}
-          onClick={() => { if (toggleRef.current) onToggle(toggleRef.current) }}>
-          <span className="experience-accordion-heading" data-reveal="accordion-row" data-reveal-order="0">
-            <span>{open ? title : items.slice(0, 2).map(item => item.company).join(', ')}</span>
-            <span className="experience-accordion-meta" aria-hidden="true">
-              {!open && hiddenCount > 0 ? <span className="experience-accordion-count">+{hiddenCount}</span> : null}
-              <Icon name="chevron-down" />
-            </span>
-          </span>
-          <span className="experience-accordion-hint" data-reveal="accordion-row" data-reveal-order="1">
-            {open ? 'Нажмите, чтобы свернуть' : 'Нажмите, чтобы раскрыть'}
-          </span>
-        </button>
-        <div className="experience-accordion-fold" ref={foldRef} id={`${id}-accordion-list`}
-          aria-hidden={!open} inert={!open}
-          onTransitionEnd={(event) => {
-            if (event.target !== event.currentTarget || event.propertyName !== 'height') return
-            if (open) event.currentTarget.style.height = 'auto'
-            else onCollapsed()
-          }}>
-          <div className="experience-accordion-inner" ref={contentRef}>
-            <ResumeEntries items={items} />
-          </div>
-        </div>
-      </div>
+export function ExperienceContent() {
+  return <Typography><div className="profile-details">
+    <section className="experience" id="experience" aria-labelledby="experience-title">
+      <div className="section-heading"><h1 id="experience-title" data-reveal="text">Опыт работы</h1></div>
+      <ResumeEntries items={experience} />
     </section>
-  )
+    <section className="education-section" id="education" aria-labelledby="education-title">
+      <div className="section-heading"><h2 id="education-title" data-reveal="text">Образование<br />и курсы</h2></div>
+      <ResumeEntries items={education} />
+    </section>
+    <section className="tools-section" aria-labelledby="tools-title">
+      <h2 id="tools-title" data-reveal="text">Инструменты</h2>
+      <ToolsStrip />
+    </section>
+  </div></Typography>
 }
 
-export function ProfileSidebar() {
-  const reducedMotion = useReducedMotion()
-  const [experienceOpen, setExperienceOpen] = useState(false)
-  const [educationOpen, setEducationOpen] = useState(false)
-  const [stickyReady, setStickyReady] = useState(true)
-  const shellRef = useRef<HTMLElement>(null)
-  const lastToggleRef = useRef<HTMLButtonElement | null>(null)
-  const toggleTopBeforeChange = useRef<number | null>(null)
-  const stickyFallback = useRef<number | null>(null)
-
-  useEffect(() => () => {
-    if (stickyFallback.current !== null) window.clearTimeout(stickyFallback.current)
-  }, [])
-
-  useLayoutEffect(() => {
-    const shell = shellRef.current
-    if (!shell || experienceOpen || educationOpen || !stickyReady) return
-    const measure = () => {
-      const availableTop = window.innerHeight - shell.getBoundingClientRect().height - 24
-      shell.style.setProperty('--profile-sticky-top', `${Math.min(24, availableTop)}px`)
-    }
-    const observer = new ResizeObserver(measure)
-    observer.observe(shell)
-    window.addEventListener('resize', measure)
-    measure()
-    return () => {
-      observer.disconnect()
-      window.removeEventListener('resize', measure)
-    }
-  }, [experienceOpen, educationOpen, stickyReady])
-
-  useLayoutEffect(() => {
-    const previousTop = toggleTopBeforeChange.current
-    const button = lastToggleRef.current
-    if (previousTop === null || !button) return
-    toggleTopBeforeChange.current = null
-    const shift = button.getBoundingClientRect().top - previousTop
-    if (Math.abs(shift) > 1) window.scrollBy({ top: shift, behavior: 'instant' })
-  }, [experienceOpen, educationOpen, stickyReady])
-
-  const finishCollapse = () => {
-    if (experienceOpen || educationOpen || stickyReady) return
-    if (stickyFallback.current !== null) window.clearTimeout(stickyFallback.current)
-    stickyFallback.current = null
-    toggleTopBeforeChange.current = lastToggleRef.current?.getBoundingClientRect().top ?? null
-    setStickyReady(true)
-  }
-
-  const toggleAccordion = (id: 'experience' | 'education', button: HTMLButtonElement) => {
-    if (stickyFallback.current !== null) window.clearTimeout(stickyFallback.current)
-    stickyFallback.current = null
-    lastToggleRef.current = button
-    toggleTopBeforeChange.current = button.getBoundingClientRect().top
-    const isOpen = id === 'experience' ? experienceOpen : educationOpen
-    if (id === 'experience') setExperienceOpen(!isOpen)
-    else setEducationOpen(!isOpen)
-    if (isOpen && !(id === 'experience' ? educationOpen : experienceOpen)) {
-      stickyFallback.current = window.setTimeout(() => {
-        stickyFallback.current = null
-        toggleTopBeforeChange.current = button.getBoundingClientRect().top
-        setStickyReady(true)
-      }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 480)
-    } else {
-      setStickyReady(false)
-    }
-  }
-
+export function ProfileContact() {
+  const { variants } = useMotionSystem()
   return (
-    <aside ref={shellRef} className={`profile-shell${!experienceOpen && !educationOpen && stickyReady ? ' profile-shell--sticky' : ''}`} aria-label="О дизайнере">
-      <ToolsStrip />
-      <section className="profile-info" id="profile">
-        <div className="profile-avatar" data-reveal="avatar">
-          <img src={publicAsset('cases/avatar.jpg')} alt={`Фото ${profile.name}`} width="160" height="160" decoding="async" />
-        </div>
-        <header className="profile-heading">
-          <div className="profile-heading-top">
-            <div className="profile-identity">
-              <h1 data-reveal="intro" data-reveal-order="0">{profile.name}</h1>
-              <p className="profile-role" data-reveal="intro" data-reveal-order="1">{profile.role}</p>
-            </div>
-            <span className="profile-contact-reveal" data-reveal="intro" data-reveal-order="3">
-              <motion.a className="icon-action button--contact" href={profile.telegram} target="_blank" rel="noreferrer" aria-label="Связаться в Telegram" title="Связаться в Telegram"
-                onClick={() => { trackEvent('contact_click', { location: 'profile' }); trackEvent('telegram_click', { location: 'profile' }) }}
-                initial="rest" whileHover={reducedMotion ? undefined : 'hover'}>
-                <motion.span className="telegram-icon-motion" variants={{ rest: { transform: 'translate(0px, 0px) rotate(0deg)' }, hover: { transform: 'translate(2px, -2px) rotate(-10deg)' } }}
-                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}><Icon name="telegram" /></motion.span>
-              </motion.a>
-            </span>
-          </div>
-          <p className="profile-location" data-reveal="intro" data-reveal-order="1"><MetaSeparatedText value={profile.location} /></p>
-        </header>
-        <nav className="profile-links" id="contacts" aria-label="Профили и контакты" data-reveal="intro" data-reveal-order="3">
-          <a href={profile.cv} target="_blank" rel="noreferrer" onClick={() => trackEvent('resume_click', { location: 'profile' })}>
-            <span className="icon-motion"><Icon name="document" /></span> Резюме
-          </a>
-          <a href={profile.linkedin} target="_blank" rel="noreferrer" onClick={() => trackEvent('linkedin_click', { location: 'profile' })}>
-            <span className="icon-motion"><Icon name="linkedin" /></span> LinkedIn
-          </a>
-          <a href={profile.email} onClick={() => trackEvent('email_click', { location: 'profile' })}>
-            <span className="icon-motion"><Icon name="mail" /></span> Почта
-          </a>
-        </nav>
-        <p className="profile-about" data-reveal="intro" data-reveal-order="2">{profile.about}</p>
-      </section>
-      <ResumeAccordion id="experience" title="Опыт работы" items={experience} open={experienceOpen}
-        onToggle={(button) => toggleAccordion('experience', button)} onCollapsed={finishCollapse} />
-      <ResumeAccordion id="education" title="Образование и курсы" items={education} open={educationOpen}
-        onToggle={(button) => toggleAccordion('education', button)} onCollapsed={finishCollapse} />
-    </aside>
+    <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, amount: .08 }} className="contacts-section" id="contacts" data-canvas-panel aria-labelledby="contacts-title">
+      <div className="contact-copy">
+        <motion.h2 id="contacts-title" variants={variants('fade')}>Будем на связи!</motion.h2>
+        <motion.div className="contact-actions" variants={variants('soft', .12)}><TelegramLink location="contacts" label="Связаться" showIcon={false} /><SocialIconLinks location="contacts" first="hh" /></motion.div>
+      </div>
+      <motion.div className="contact-signature" variants={variants('left', .22)}>@wsslxq</motion.div>
+      <motion.img variants={variants('scale', .18)} className="contact-portrait" src={publicAsset('cases/contact-portrait.jpg')} alt="Фото Софьи Стрельченко" width="2592" height="3240" loading="lazy" />
+      <Footer />
+    </motion.section>
   )
 }

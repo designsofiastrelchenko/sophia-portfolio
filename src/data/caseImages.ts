@@ -6,6 +6,27 @@ type Section = keyof NonNullable<Project['images']>
 type CaseImages = NonNullable<Project['images']>
 type ImageEntry = [file: string, caption: string]
 
+// Counts describe the existing compositions, not their aspect ratio.
+// Only groups with at least three screens opt into the compact presentation.
+const multiScreenCounts: Partial<Record<keyof typeof sizes, Record<string, number>>> = {
+  'partner-portal': { 'Mob - 12.png': 3, 'Mob - 13.png': 3 },
+  skywallet: {
+    '1.png': 4, '3.png': 4, '4.png': 3, '5.png': 4, '6.png': 4, '7.png': 3,
+    'CEX - 9.png': 4, 'CEX - 10.png': 3, 'CEX - 11.png': 3, 'CEX - 12.png': 5,
+    '13.png': 4, '14.png': 4, '15.png': 3, '16.png': 4,
+  },
+  astoria: { '8.png': 4 },
+  'womens-health': {
+    '1.png': 3, '2.png': 4, '3.png': 3, '4.png': 4, '5.png': 3, '6.png': 3,
+    '7.png': 3, '8.png': 4, '9.png': 5, '10.png': 4, '11.png': 3, '12.png': 3,
+    '13.png': 3,
+  },
+  atlyx: {
+    '1.png': 4, '2.png': 3, '3.png': 3, '4.png': 3, '6.png': 5, '7.png': 3,
+    '8.png': 4, '11.png': 5, '12.png': 3, '13.png': 3, '14.png': 3, '15.png': 3,
+  },
+}
+
 export function caseCoverDimensions(caseId: keyof typeof sizes) {
   const [width, height] = (sizes[caseId] as Record<string, number[]>)['Обложка.png']
   return { width, height }
@@ -19,6 +40,7 @@ function image(caseId: keyof typeof sizes, file: string, caption: string): CaseI
     caption,
     width,
     height,
+    screenCount: multiScreenCounts[caseId]?.[file],
   }
 }
 

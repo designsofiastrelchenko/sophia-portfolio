@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from 'framer-motion'
+import { useMotionSystem } from '../lib/motion'
+import { motion } from 'framer-motion'
 import { ArrowIcon, InlineArrows } from './ArrowIcon'
 import { withoutFinalPeriod } from '../data/caseContent'
 import { CaseDiagram } from './CaseDiagram'
@@ -35,31 +36,31 @@ function repeatsHeading(title: string, heading: string, id: string) {
 }
 
 export function CaseVisual({ visual, precedingHeading = '' }: { visual: CaseVisualSpec; precedingHeading?: string }) {
-  const reducedMotion = useReducedMotion()
+  const { reveal, variants } = useMotionSystem()
   const showHeading = !repeatsHeading(visual.title, precedingHeading, visual.id)
   const diagramMode = diagramModeFor(visual.id)
   const isTable = visual.kind === 'columns' && visual.columns && !diagramMode
 
   return (
-    <figure className={`case-visual case-visual--${visual.kind}${showHeading ? '' : ' case-visual--untitled'}`}
+    <motion.figure className={`case-visual case-visual--${visual.kind}${showHeading ? '' : ' case-visual--untitled'}`}
+      {...reveal(visual.kind === 'comparison' ? 'right' : visual.kind === 'flow' ? 'left' : 'scale', .08)}
       aria-labelledby={showHeading ? `${visual.id}-title` : undefined}
       aria-label={showHeading ? undefined : visual.title}>
-      <div className="case-visual-surface">
       {showHeading ? (
-        <div className="case-visual-heading" data-reveal="text">
+        <figcaption className="case-visual-heading" id={`${visual.id}-title`}>
           <ArrowIcon direction="up-right" decorative className="case-visual-index" />
-          <figcaption id={`${visual.id}-title`}><InlineArrows text={visual.title} /></figcaption>
-        </div>
+          <span><InlineArrows text={visual.title} /></span>
+        </figcaption>
       ) : null}
       {isTable ? (
-        <div className="case-visual-table-wrap" data-reveal="table">
+        <div className="case-visual-table-wrap">
           <table className="case-visual-table">
             <thead><tr>{visual.columns?.map((column) => <th scope="col" key={column}><InlineArrows text={column} /></th>)}</tr></thead>
             <tbody>{visual.items.map((item) => (
               <tr key={item.label}>
                 <th scope="row" data-label={visual.columns?.[0]}><InlineArrows text={item.label} /></th>
-                <td data-label={visual.columns?.[1]}>{item.detail && <InlineArrows text={item.detail} />}</td>
-                <td data-label={visual.columns?.[2]}>{item.note && <InlineArrows text={item.note} />}</td>
+                <td data-label={visual.columns?.[1]}>{item.detail && <InlineArrows text={withoutFinalPeriod(item.detail)} />}</td>
+                <td data-label={visual.columns?.[2]}>{item.note && <InlineArrows text={withoutFinalPeriod(item.note)} />}</td>
               </tr>
             ))}</tbody>
           </table>
@@ -68,26 +69,22 @@ export function CaseVisual({ visual, precedingHeading = '' }: { visual: CaseVisu
         <CaseDiagram visual={visual} mode={diagramMode} />
       ) : visual.presentation === 'results' ? (
         <motion.ul className="case-visual-results case-metric-grid"
-          initial={reducedMotion ? false : 'hidden'} whileInView="show"
-          viewport={{ once: true, amount: 0.05, margin: '0px 0px -12% 0px' }}
-          variants={{ show: { transition: { staggerChildren: reducedMotion ? 0 : 0.08 } } }}>
+          initial="hidden" whileInView="visible" viewport={{ once: true, amount: .05 }}>
           {visual.items.map((item, index) => (
             <motion.li key={`${item.label}-${index}`}
-              variants={{ hidden: { opacity: 0, transform: 'translateY(12px)' }, show: { opacity: 1, transform: 'translateY(0px)' } }}
-              transition={{ duration: reducedMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}>
-              {item.detail && <strong><InlineArrows text={item.detail} /></strong>}
-              <span><InlineArrows text={item.label} /></span>
+              variants={variants('scale', index * .05)}>
+              {item.detail && <motion.strong variants={variants('fade', index * .05)}><InlineArrows text={withoutFinalPeriod(item.detail)} /></motion.strong>}
+              <motion.span variants={variants('fade', .1 + index * .05)}><InlineArrows text={item.label} /></motion.span>
             </motion.li>
           ))}
         </motion.ul>
       ) : (
         <dl className="case-visual-plain">{visual.items.map((item) => <div key={item.label}>
           <dt><InlineArrows text={item.label} /></dt>
-          <dd>{item.detail && <InlineArrows text={item.detail} />}</dd>
+          <dd>{item.detail && <InlineArrows text={withoutFinalPeriod(item.detail)} />}</dd>
         </div>)}</dl>
       )}
-      {visual.caption && <p className="case-visual-caption" data-reveal="text"><InlineArrows text={withoutFinalPeriod(visual.caption)} /></p>}
-      </div>
-    </figure>
+      {visual.caption && <p className="case-visual-caption"><InlineArrows text={withoutFinalPeriod(visual.caption)} /></p>}
+    </motion.figure>
   )
 }
