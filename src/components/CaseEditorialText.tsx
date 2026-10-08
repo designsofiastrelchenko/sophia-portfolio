@@ -11,7 +11,7 @@ export function CaseEditorialText({ nodes, children, section, width }: {
   const standalone = nodes.every(node => node.kind === 'heading')
   const reflection = nodes.some(node => node.kind === 'heading' && node.text.startsWith('Рефлексия'))
   const textWidth = width ?? (reflection || section === 'final' ? 'wide' : 'regular')
-  return <motion.div {...reveal(reflection ? 'fade' : 'soft', .06)} className={`${standalone ? 'case-standalone-heading' : 'case-text-card'} case-editorial-text case-text--${textWidth} case-layout--${reflection ? 'statement' : 'reading'}`}>
+  return <motion.div {...reveal(reflection ? 'fade' : 'soft', .06)} className={`${standalone ? 'case-standalone-heading' : 'case-text-card'} case-editorial-text case-text--${textWidth} case-layout--reading`}>
     {children}
   </motion.div>
 }

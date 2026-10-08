@@ -25,15 +25,15 @@ export function AchievementArtwork() {
     </motion.g>
     <motion.g animate={{ transform: floating ? ['translateY(0px)', 'translateY(-4px)', 'translateY(0px)'] : 'none' }}
       transition={floating ? { duration: 4.6, repeat: Infinity, delay: 0.0, ease: 'easeInOut' } : { duration: .1 }}>
-  <path d="M16 13C17 20 18 21 25 22C18 23 17 24 16 31C15 24 14 23 7 22C14 21 15 20 16 13Z" fill="var(--color-muted)"/>
+  <path d="M16 13C17 20 18 21 25 22C18 23 17 24 16 31C15 24 14 23 7 22C14 21 15 20 16 13Z" fill="var(--color-trophy-sparkle)"/>
     </motion.g>
     <motion.g animate={{ transform: floating ? ['translateY(0px)', 'translateY(-5px)', 'translateY(0px)'] : 'none' }}
       transition={floating ? { duration: 5.1, repeat: Infinity, delay: 0.25, ease: 'easeInOut' } : { duration: .1 }}>
-  <path d="M101 39C102 45 103 46 109 47C103 48 102 49 101 55C100 49 99 48 93 47C99 46 100 45 101 39Z" fill="var(--color-muted)"/>
+  <path d="M101 39C102 45 103 46 109 47C103 48 102 49 101 55C100 49 99 48 93 47C99 46 100 45 101 39Z" fill="var(--color-trophy-sparkle)"/>
     </motion.g>
     <motion.g animate={{ transform: floating ? ['translateY(0px)', 'translateY(-6px)', 'translateY(0px)'] : 'none' }}
       transition={floating ? { duration: 5.6, repeat: Infinity, delay: 0.5, ease: 'easeInOut' } : { duration: .1 }}>
-  <path d="M98 10C99 14 100 15 104 16C100 17 99 18 98 22C97 18 96 17 92 16C96 15 97 14 98 10Z" fill="var(--color-muted)"/>
+  <path d="M98 10C99 14 100 15 104 16C100 17 99 18 98 22C97 18 96 17 92 16C96 15 97 14 98 10Z" fill="var(--color-trophy-sparkle)"/>
     </motion.g>
   </motion.svg>
 }
