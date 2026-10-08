@@ -21,7 +21,7 @@ const homeLinks = [
   { href: '/#about', label: 'Обо мне' },
 ]
 
-export function MobileHeader({ showBack = false }: { showBack?: boolean }) {
+export function MobileHeader({ showBack = false, backTo = '/' }: { showBack?: boolean; backTo?: string }) {
   const { variants, hoverLift, navHover } = useMotionSystem()
   const { pathname, search } = useLocation()
   const [openFor, setOpenFor] = useState<string | null>(null)
@@ -133,7 +133,7 @@ export function MobileHeader({ showBack = false }: { showBack?: boolean }) {
   return (
     <motion.header initial="hidden" animate="visible" variants={variants('fade')} className={`site-header mobile-header${pathname === '/' ? ' site-header--home' : ''}`} ref={headerRef}>
       <div className={`desktop-header${showBack ? ' desktop-header--back' : ''}`}>
-        {showBack && <BackButton to="/" />}
+        {showBack && <BackButton to={backTo} />}
         <nav className="header-navigation" aria-label="Главная навигация">
           {homeLinks.map(link => <MotionLink style={{ transform: 'translateY(0px) scale(1)' }} whileHover={navHover} whileTap={hoverLift.whileTap} transition={hoverLift.transition} key={link.href} to={link.href}
             onClick={event => {
@@ -150,7 +150,7 @@ export function MobileHeader({ showBack = false }: { showBack?: boolean }) {
       <AnimatePresence>{open && <motion.div className="mobile-menu-backdrop" data-open="true" aria-hidden="true"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .18 }} onClick={() => setOpenFor(null)} />}</AnimatePresence>
       <div className={`mobile-header-inner${isCase ? ' mobile-header-inner--case' : ' mobile-header-inner--home'}${showBack ? ' mobile-header-inner--back' : ''}`}>
-        {showBack ? <><BackButton to="/" /><div className="mobile-header-spacer" /></> : <Link
+        {showBack ? <><BackButton to={backTo} /><div className="mobile-header-spacer" /></> : <Link
           className="mobile-brand"
           to="/"
           aria-label="На главную"
