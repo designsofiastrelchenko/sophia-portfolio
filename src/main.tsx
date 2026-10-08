@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
+import { InitialLoader } from './components/InitialLoader'
 import './styles/tokens.css'
 import './styles/reset.css'
 import './styles/globals.css'
@@ -13,5 +14,6 @@ window.history.scrollRestoration = 'manual'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
+    <InitialLoader />
   </StrictMode>,
 )

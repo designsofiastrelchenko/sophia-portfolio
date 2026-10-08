@@ -32,11 +32,10 @@ export function MobileHeader() {
   const headerRef = useRef<HTMLElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const isCase = pathname.startsWith('/projects/')
-  const isShort = new URLSearchParams(search).get('version') === 'short'
   const sections = useMemo(() => {
     const project = projects.find(project => pathname === `/projects/${project.id}`)
-    return project ? getCaseNavigationSections(project, isShort) : []
-  }, [pathname, isShort])
+    return project ? getCaseNavigationSections(project) : []
+  }, [pathname])
   const isActiveLink = (href: string) => href.includes('#')
     ? pathname === '/' && activeSection === href.split('#')[1]
     : pathname === href

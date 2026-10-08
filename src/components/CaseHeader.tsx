@@ -14,8 +14,7 @@ export function CaseHeader() {
   const { pathname, search } = useLocation()
   const navigate = useNavigate()
   const project = projects.find(item => pathname === `/projects/${item.id}`)
-  const short = new URLSearchParams(search).get('version') === 'short'
-  const sections = useMemo(() => project ? getCaseNavigationSections(project, short) : [], [project, short])
+  const sections = useMemo(() => project ? getCaseNavigationSections(project) : [], [project])
   const [active, setActive] = useState('overview')
   const { scrollYProgress } = useScroll({ trackContentSize: true })
 
@@ -55,11 +54,11 @@ export function CaseHeader() {
   }
 
   return <>
-    <motion.div className="case-reading-progress" style={{ scaleX: scrollYProgress }} aria-hidden="true" />
+    {project && <motion.div className="case-reading-progress" style={{ scaleX: scrollYProgress }} aria-hidden="true" />}
     <motion.header initial="hidden" animate="visible" variants={variants('fade')} className="site-header case-site-header">
       <div className="case-header-controls">
-        <BackButton />
-        <nav className="case-header-anchors" aria-label="Разделы проекта">
+        <BackButton to={pathname === '/copyright' ? '/' : '/#work'} />
+        {sections.length > 0 ? <nav className="case-header-anchors" aria-label="Разделы проекта">
           {sections.map(section => <motion.a style={{ transform: 'translateY(0px) scale(1)' }} whileHover={navHover} whileTap={hoverLift.whileTap} transition={hoverLift.transition} key={section.id} href={`#${section.id}`}
             aria-current={active === section.id ? 'location' : undefined}
             onClick={event => {
@@ -67,8 +66,8 @@ export function CaseHeader() {
               event.preventDefault()
               goTo(section.id)
             }}>{bindShortWords(section.label)}</motion.a>)}
-        </nav>
-        <CaseSectionMenu sections={sections} active={active} onNavigate={goTo} />
+        </nav> : <div className="case-header-spacer" />}
+        {sections.length > 0 && <CaseSectionMenu sections={sections} active={active} onNavigate={goTo} />}
         <TelegramLink location="case-header" label="TG" />
       </div>
     </motion.header>

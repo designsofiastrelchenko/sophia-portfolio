@@ -2,13 +2,12 @@ import { useMotionSystem } from '../lib/motion'
 import { useEffect } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { ReactNode } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { profile, projects } from '../data/portfolio'
 import type { CaseImage } from '../data/portfolio'
 import { getCaseGroups, withoutFinalPeriod } from '../data/caseContent'
 import type { CaseNode } from '../data/caseContent'
 import { Icon } from '../components/Icon'
-import { SegmentedControl } from '../components/SegmentedControl'
 import { ConceptCasePage } from './ConceptCasePage'
 import { CaseVisual } from '../components/CaseVisual'
 import type { CaseVisualSpec } from '../components/CaseVisual'
@@ -23,11 +22,6 @@ import { CaseMediaStage } from '../components/CaseMediaStage'
 import { CaseEditorialText } from '../components/CaseEditorialText'
 import { audienceStatementLength, companionStart, isNarrativeLead } from '../lib/caseEditorial'
 import '../styles/caseEditorial.css'
-
-const versionOptions = [
-  { value: 'full', label: 'Полная версия' },
-  { value: 'short', label: 'Сокращённая версия' },
-]
 
 function CaseNodeView({ node }: { node: CaseNode }) {
   if (node.kind === 'heading') {
@@ -187,8 +181,6 @@ function CaseGallery({ images, heightFill = false }: { images: CaseImage[] | und
 export function ProjectPage() {
   const { slug } = useParams()
   const project = projects.find((item) => item.id === slug)
-  const [searchParams, setSearchParams] = useSearchParams()
-  const isShort = searchParams.get('version') === 'short'
 
   useEffect(() => {
     document.title = project
@@ -208,21 +200,7 @@ export function ProjectPage() {
   if (project.videos)
     return <ConceptCasePage project={project} />
 
-  function changeVersion(short: boolean) {
-    setSearchParams(
-      (previous) => {
-        const next = new URLSearchParams(previous)
-        if (short) next.set('version', 'short')
-        else next.delete('version')
-        return next
-      },
-      { preventScrollReset: true },
-    )
-  }
-
-  const groups = getCaseGroups(project).filter(
-    (group) => !isShort || group.id === 'context' || group.id === 'final',
-  )
+  const groups = getCaseGroups(project)
   const showThanks = (projects.indexOf(project) + 1) % 2 === 0
 
   return (
@@ -238,13 +216,6 @@ export function ProjectPage() {
           ) : null}
           <h1 data-reveal="case-intro" data-reveal-order={project.figmaUrl ? 1 : 0}>{project.title}</h1>
         </header>
-        <SegmentedControl
-          label="Версия кейса"
-          value={isShort ? 'short' : 'full'}
-          options={versionOptions}
-          controls="case-content"
-          onChange={(value) => changeVersion(value === 'short')}
-        />
         <div className="case-content" id="case-content">
           <div className="case-overview" id="overview">
             <dl className="case-facts" aria-label="О проекте">

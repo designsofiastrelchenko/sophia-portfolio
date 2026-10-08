@@ -7,7 +7,7 @@ export const profile = {
   role: 'UX/UI & Product Designer',
   location: 'Москва • GMT+3',
   email: 'mailto:sofia.ux.ui@icloud.com',
-  telegram: 'https://example.com/telegram',
+  telegram: 'https://t.me/wsslxq',
   cv: 'https://example.com/resume',
   hh: 'https://example.com/hh',
   linkedin: 'https://www.linkedin.com/in/sophie-dsgn',

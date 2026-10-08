@@ -61,19 +61,32 @@ export function HomeCanvas() {
     // On a fresh document the browser's native fragment scroll runs after the
     // first layout effects. Resolve that fragment once, after native loading,
     // using the canvas's actual coordinates instead of its vertical DOM order.
-    if (document.readyState === 'complete' || !location.hash) return
+    if (document.readyState === 'complete') return
     let frame = 0
+    let interacted = false
+    const markInteraction = () => { interacted = true }
+    window.addEventListener('wheel', markInteraction, { passive: true })
+    window.addEventListener('touchstart', markInteraction, { passive: true })
+    window.addEventListener('keydown', markInteraction)
     const finish = () => {
       frame = requestAnimationFrame(() => {
-        if (positioned.current !== location.key) return
-        const target = document.getElementById(location.hash.slice(1))
+        if (positioned.current !== location.key || interacted) return
+        const target = location.hash ? document.getElementById(location.hash.slice(1)) : null
         if (target) navigateToSection(target, 'instant')
+        else if (!location.hash && mountPosition.current === undefined)
+          window.scrollTo({ top: start.get(), behavior: 'instant' })
         scrollY.set(window.scrollY)
       })
     }
     window.addEventListener('load', finish, { once: true })
-    return () => { window.removeEventListener('load', finish); cancelAnimationFrame(frame) }
-  }, [location.key, location.hash, scrollY])
+    return () => {
+      window.removeEventListener('load', finish)
+      window.removeEventListener('wheel', markInteraction)
+      window.removeEventListener('touchstart', markInteraction)
+      window.removeEventListener('keydown', markInteraction)
+      cancelAnimationFrame(frame)
+    }
+  }, [location.key, location.hash, scrollY, start])
 
   useLayoutEffect(() => {
     const element = track.current

@@ -61,7 +61,7 @@ function HomePage() {
 }
 function SiteHeader() {
   const { pathname } = useLocation()
-  return pathname.startsWith('/projects/') ? <CaseHeader key={pathname} /> : <MobileHeader />
+  return pathname.startsWith('/projects/') || pathname === '/copyright' ? <CaseHeader key={pathname} /> : <MobileHeader />
 }
 function App() {
   return (

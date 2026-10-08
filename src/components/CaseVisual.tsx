@@ -1,6 +1,7 @@
 import { useMotionSystem } from '../lib/motion'
 import { motion } from 'framer-motion'
-import { ArrowIcon, InlineArrows } from './ArrowIcon'
+import { InlineArrows } from './ArrowIcon'
+import { Icon } from './Icon'
 import { withoutFinalPeriod } from '../data/caseContent'
 import { CaseDiagram } from './CaseDiagram'
 import { diagramModeFor } from '../data/caseDiagramModes'
@@ -48,7 +49,7 @@ export function CaseVisual({ visual, precedingHeading = '' }: { visual: CaseVisu
       aria-label={showHeading ? undefined : visual.title}>
       {showHeading ? (
         <figcaption className="case-visual-heading" id={`${visual.id}-title`}>
-          <ArrowIcon direction="up-right" decorative className="case-visual-index" />
+          <span className="case-visual-index" aria-hidden="true"><Icon name="grid" /></span>
           <span><InlineArrows text={visual.title} /></span>
         </figcaption>
       ) : null}

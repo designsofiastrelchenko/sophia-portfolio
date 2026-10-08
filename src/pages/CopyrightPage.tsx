@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { Footer } from '../components/Footer'
-import { BackButton } from '../components/BackButton'
 import { profile } from '../data/portfolio'
 import { trackEvent } from '../lib/analytics'
 import { Typography } from '../components/Typography'
@@ -10,7 +9,6 @@ export function CopyrightPage() {
 
   return (
     <Typography><main className="copyright-page" id="main-content" tabIndex={-1}>
-      <BackButton to="/" />
       <article className="copyright-document">
         <h1>Уведомление об авторских правах на материалы портфолио</h1>
 

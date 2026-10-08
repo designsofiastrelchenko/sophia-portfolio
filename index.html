@@ -45,7 +45,29 @@
     <meta name="twitter:image:alt" content="Первый экран портфолио Софьи Стрельченко" />
   </head>
   <body>
-    <div id="root"></div>
+    <style>
+      .initial-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--color-page, #f3f3f5);
+        color: var(--color-muted, #666666);
+        font-family: var(--font-sans, Onest, Arial, sans-serif);
+        font-size: clamp(16px, 1.25vw, 18px);
+        line-height: 1.5;
+        text-align: center;
+      }
+      .initial-loader p { margin: 0; }
+      #root[data-initial-loading] > :not(.initial-loader) { visibility: hidden; }
+    </style>
+    <div id="root" data-initial-loading>
+      <div class="initial-loader" role="status" aria-live="polite">
+        <p>Докручиваю детали и выравниваю сетку…</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

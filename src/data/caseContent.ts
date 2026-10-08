@@ -145,10 +145,13 @@ export function getCaseGroups(project: Project): CaseGroup[] {
   return groups.filter((group) => group.nodes.length > 0)
 }
 
-export function getCaseNavigationSections(project: Project, isShort = false) {
-  if (project.videos) return project.videos.map(video => ({ id: video.id, label: video.shortTitle }))
-  const groups = getCaseGroups(project).filter(group => !isShort || group.id === 'context' || group.id === 'final')
-  const reflection = groups.flatMap(group => group.nodes).find(node => node.kind === 'heading' && node.text.startsWith('Рефлексия'))
-  return [{ id: 'overview', label: 'О проекте' }, ...groups.map(group => ({ id: group.id, label: group.title })),
-    ...(reflection?.kind === 'heading' ? [{ id: 'reflection', label: reflection.text }] : [])]
+export function getCaseNavigationSections(project: Project) {
+  if (project.videos) return [
+    { id: 'overview', label: 'Контекст' },
+    { id: project.videos[0].id, label: 'UX/UI-решение' },
+    { id: 'concept-results', label: 'Результаты и выводы' },
+  ]
+  return getCaseGroups(project)
+    .filter(group => ['context', 'concept', 'final'].includes(group.id))
+    .map(group => ({ id: group.id, label: group.id === 'concept' ? 'UX/UI-решение' : group.title }))
 }
