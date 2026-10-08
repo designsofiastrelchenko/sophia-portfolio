@@ -12,6 +12,7 @@ import { publicAsset } from '../lib/publicAsset'
 import { Icon } from './Icon'
 import { scrollToCanvasTarget } from '../lib/canvasNavigation'
 import { useAdaptivePress } from '../lib/useAdaptivePress'
+import { BackButton } from './BackButton'
 
 const MotionLink = motion.create(Link)
 
@@ -20,7 +21,7 @@ const homeLinks = [
   { href: '/#about', label: 'Обо мне' },
 ]
 
-export function MobileHeader() {
+export function MobileHeader({ showBack = false }: { showBack?: boolean }) {
   const { variants, hoverLift, navHover } = useMotionSystem()
   const { pathname, search } = useLocation()
   const [openFor, setOpenFor] = useState<string | null>(null)
@@ -131,7 +132,8 @@ export function MobileHeader() {
 
   return (
     <motion.header initial="hidden" animate="visible" variants={variants('fade')} className={`site-header mobile-header${pathname === '/' ? ' site-header--home' : ''}`} ref={headerRef}>
-      <div className="desktop-header">
+      <div className={`desktop-header${showBack ? ' desktop-header--back' : ''}`}>
+        {showBack && <BackButton to="/" />}
         <nav className="header-navigation" aria-label="Главная навигация">
           {homeLinks.map(link => <MotionLink style={{ transform: 'translateY(0px) scale(1)' }} whileHover={navHover} whileTap={hoverLift.whileTap} transition={hoverLift.transition} key={link.href} to={link.href}
             onClick={event => {
@@ -147,8 +149,8 @@ export function MobileHeader() {
       </div>
       <AnimatePresence>{open && <motion.div className="mobile-menu-backdrop" data-open="true" aria-hidden="true"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .18 }} onClick={() => setOpenFor(null)} />}</AnimatePresence>
-      <div className={`mobile-header-inner${isCase ? ' mobile-header-inner--case' : ' mobile-header-inner--home'}`}>
-        <Link
+      <div className={`mobile-header-inner${isCase ? ' mobile-header-inner--case' : ' mobile-header-inner--home'}${showBack ? ' mobile-header-inner--back' : ''}`}>
+        {showBack ? <><BackButton to="/" /><div className="mobile-header-spacer" /></> : <Link
           className="mobile-brand"
           to="/"
           aria-label="На главную"
@@ -156,7 +158,7 @@ export function MobileHeader() {
         >
           <img src={publicAsset('icons/favicon/Logo 64 — Light.svg')} alt="" width="32" height="32" />
           <span>{profile.name}</span>
-        </Link>
+        </Link>}
         <TelegramLink location="mobile-header" compact />
         <motion.button {...press}
           className="icon-action mobile-menu-toggle"

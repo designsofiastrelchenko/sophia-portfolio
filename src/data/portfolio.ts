@@ -109,7 +109,7 @@ export const toolLogos = [
   { id: 'cursor', label: 'Cursor', src: '/icons/tools/cursor.svg' },
 ].map((tool) => ({ ...tool, src: publicAsset(tool.src) }))
 
-export const aboutTools = toolLogos.flatMap(({ id, label }) => id === 'figma'
+export const aboutTools = toolLogos.filter(({ id }) => id !== 'cursor').flatMap(({ id, label }) => id === 'figma'
   ? [{ id, label }, { id: 'figma-motion', label: 'Figma Motion' }, { id: 'figjam', label: 'FigJam' }]
   : [{ id, label }])
 
