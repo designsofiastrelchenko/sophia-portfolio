@@ -18,6 +18,7 @@ import { MobileHeader } from './components/MobileHeader'
 import { CaseHeader } from './components/CaseHeader'
 import { CopyrightPage } from './pages/CopyrightPage'
 import { useCaseScrollTracking, usePageTracking } from './hooks/useAnalyticsTracking'
+import { useLocale } from './i18n/locale'
 
 function AnalyticsTracking() {
   usePageTracking()
@@ -31,7 +32,6 @@ function ScrollToPage() {
   const previousPath = useRef<string | null>(null)
   useLayoutEffect(() => {
     cancelSectionNavigation()
-    if (pathname === '/') document.title = `${profile.name} — ${profile.role}`
     if (previousPath.current !== null && previousPath.current !== pathname) {
       document.getElementById('main-content')?.focus({ preventScroll: true })
     }
@@ -57,6 +57,8 @@ function ScrollToPage() {
   return null
 }
 function HomePage() {
+  const { t } = useLocale()
+  useLayoutEffect(() => { document.title = `${t(profile.name)} — ${t(profile.role)}` }, [t])
   return <HomeCanvas />
 }
 function SiteHeader() {

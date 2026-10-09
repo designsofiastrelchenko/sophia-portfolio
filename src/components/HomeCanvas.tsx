@@ -5,6 +5,7 @@ import { savedPageScroll } from '../lib/pageScroll'
 import { ProfileContact, ProfileHero } from './ProfileSidebar'
 import { Work } from '../sections/Work'
 import { canvasPanelOffset, cancelSectionNavigation, navigateToSection, scrollToCanvasTarget } from '../lib/canvasNavigation'
+import { useLocale } from '../i18n/locale'
 
 type CanvasPanel = { element: HTMLElement; label: string; offset: number }
 
@@ -15,6 +16,7 @@ function nearestPanel(panels: CanvasPanel[], offset: number) {
 
 /** Scroll remains native: no wheel interception, artificial inertia or snapping. */
 export function HomeCanvas() {
+  const { locale } = useLocale()
   const root = useRef<HTMLElement>(null)
   const track = useRef<HTMLDivElement>(null)
   const [horizontal, setHorizontal] = useState(false)
@@ -97,7 +99,7 @@ export function HomeCanvas() {
       distance.set(travel)
       const measured = Array.from(element.querySelectorAll<HTMLElement>('[data-canvas-panel]')).map(panel => {
         const heading = panel.querySelector<HTMLElement>('h1, h2')
-        const label = panel.getAttribute('aria-label') ?? heading?.getAttribute('aria-label') ?? heading?.innerText.replace(/\s+/g, ' ').trim() ?? ''
+        const label = panel.getAttribute('aria-label') ?? heading?.getAttribute('aria-label') ?? heading?.textContent?.replace(/\s+/g, ' ').trim() ?? ''
         return { element: panel, label, offset: canvasPanelOffset(panel, element) }
       })
       // Three compact destinations: start, middle and end of the canvas.
@@ -113,7 +115,7 @@ export function HomeCanvas() {
     observer.observe(element)
     window.addEventListener('resize', measure)
     return () => { observer.disconnect(); window.removeEventListener('resize', measure) }
-  }, [horizontal, distance, start])
+  }, [horizontal, distance, start, locale])
 
   useLayoutEffect(() => {
     const expectedHorizontal = window.matchMedia('(min-width: 1101px) and (prefers-reduced-motion: no-preference)').matches

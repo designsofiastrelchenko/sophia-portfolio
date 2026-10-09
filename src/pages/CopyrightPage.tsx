@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n/locale'
 import { useEffect } from 'react'
 import { Footer } from '../components/Footer'
 import { profile } from '../data/portfolio'
@@ -5,7 +6,8 @@ import { trackEvent } from '../lib/analytics'
 import { Typography } from '../components/Typography'
 
 export function CopyrightPage() {
-  useEffect(() => { document.title = `Авторские права — ${profile.name}` }, [])
+  const { t } = useLocale()
+  useEffect(() => { document.title = `${t('Авторские права')} — ${t(profile.name)}` }, [t])
 
   return (
     <Typography><main className="copyright-page" id="main-content" tabIndex={-1}>

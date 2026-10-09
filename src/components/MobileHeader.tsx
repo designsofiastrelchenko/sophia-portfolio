@@ -13,6 +13,7 @@ import { Icon } from './Icon'
 import { scrollToCanvasTarget } from '../lib/canvasNavigation'
 import { useAdaptivePress } from '../lib/useAdaptivePress'
 import { BackButton } from './BackButton'
+import { LanguageSelector } from './LanguageSelector'
 
 const MotionLink = motion.create(Link)
 
@@ -98,7 +99,7 @@ export function MobileHeader({ showBack = false, backTo = '/' }: { showBack?: bo
         buttonRef.current?.focus()
       }
       if (event.key === 'Tab') {
-        const links = headerRef.current?.querySelectorAll<HTMLElement>('.mobile-header-inner a, .mobile-header-inner button, .mobile-menu a')
+const links = headerRef.current?.querySelectorAll<HTMLElement>('.mobile-header-inner a, .mobile-header-inner button, .mobile-menu a, .mobile-menu button')
         const first = links?.[0]
         const last = links?.[links.length - 1]
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
@@ -146,6 +147,7 @@ export function MobileHeader({ showBack = false, backTo = '/' }: { showBack?: bo
         <div className="header-actions">
           <TelegramLink location="header" label="TG" />
         </div>
+        <LanguageSelector />
       </div>
       <AnimatePresence>{open && <motion.div className="mobile-menu-backdrop" data-open="true" aria-hidden="true"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .18 }} onClick={() => setOpenFor(null)} />}</AnimatePresence>
@@ -183,6 +185,7 @@ export function MobileHeader({ showBack = false, backTo = '/' }: { showBack?: bo
         animate={{ opacity: open ? 1 : 0, transform: reducedMotion ? 'none' : open ? 'translateY(0px)' : 'translateY(-6px)' }}
         transition={{ duration: reducedMotion ? .1 : motionTokens.menu, ease: motionTokens.ease }}
       >
+        <LanguageSelector />
         {isCase ? (
           <>
             <MotionLink to="/" onClick={() => setOpenFor(null)} style={{ '--menu-order': 0 } as CSSProperties}>

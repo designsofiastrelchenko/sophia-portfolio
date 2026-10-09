@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { bindShortWords } from '../lib/typography'
+import { useLocale } from '../i18n/locale'
 
 function MetaCross() {
   return (
@@ -10,8 +11,9 @@ function MetaCross() {
 }
 
 export function MetaSeparatedText({ value, separator = 'dot' }: { value: string; separator?: 'dot' | 'slash' }) {
+  const { t } = useLocale()
   const parts = value.split(separator === 'slash' ? /\s*\/\s*/ : /\s+[•·]\s+/).filter(Boolean)
-  if (parts.length < 2) return bindShortWords(value)
+  if (parts.length < 2) return bindShortWords(t(value))
 
   return (
     <span className="meta-separated">

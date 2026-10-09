@@ -61,13 +61,30 @@
         text-align: center;
       }
       .initial-loader p { margin: 0; }
+      .loading-dots { display: inline-flex; width: 1.15em; justify-content: flex-start; white-space: nowrap; }
+      .loading-dots > span { opacity: 0; animation: loading-dot-one 1.6s steps(1,end) infinite; }
+      .loading-dots > span:nth-child(2) { animation-name: loading-dot-two; }
+      .loading-dots > span:nth-child(3) { animation-name: loading-dot-three; }
+      @keyframes loading-dot-one { 0%, 24.99% { opacity: 0; } 25%, 100% { opacity: 1; } }
+      @keyframes loading-dot-two { 0%, 49.99% { opacity: 0; } 50%, 100% { opacity: 1; } }
+      @keyframes loading-dot-three { 0%, 74.99% { opacity: 0; } 75%, 100% { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) { .loading-dots > span { animation: none; opacity: 1; } }
       #root[data-initial-loading] > :not(.initial-loader) { visibility: hidden; }
     </style>
     <div id="root" data-initial-loading>
       <div class="initial-loader" role="status" aria-live="polite">
-        <p>Докручиваю детали и выравниваю сетку…</p>
+        <p><span id="initial-loading-copy">Докручиваю детали и выравниваю сетку</span><span class="loading-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></p>
       </div>
     </div>
+    <script>
+      // Match the saved language before the application bundle is ready.
+      try {
+        if (localStorage.getItem('portfolio.locale') === 'en') {
+          document.documentElement.lang = 'en';
+          document.getElementById('initial-loading-copy').textContent = 'Polishing details and aligning the grid';
+        }
+      } catch { /* Use Russian when storage is unavailable. */ }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

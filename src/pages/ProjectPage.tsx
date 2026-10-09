@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n/locale'
 import { useMotionSystem } from '../lib/motion'
 import { useEffect } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
@@ -179,14 +180,15 @@ function CaseGallery({ images, heightFill = false }: { images: CaseImage[] | und
 }
 
 export function ProjectPage() {
+  const { t } = useLocale()
   const { slug } = useParams()
   const project = projects.find((item) => item.id === slug)
 
   useEffect(() => {
     document.title = project
-      ? `${project.title} — ${profile.name}`
-      : `Проект не найден — ${profile.name}`
-  }, [project])
+      ? `${t(project.title)} — ${t(profile.name)}`
+      : `${t('Проект не найден')} — ${t(profile.name)}`
+  }, [project, t])
 
   if (!project)
     return (
